@@ -71,7 +71,7 @@ function renderMonthlyChecklist(templates) {
         <input type="checkbox" data-id="${t.id}" class="chk-select">
         <span class="name">${escapeHtml(t.name)}</span>
         <input type="date" data-id="${t.id}" class="chk-date" value="${todayStr()}">
-        <input type="number" data-id="${t.id}" class="chk-amount" value="${t.defaultAmount}">
+        <input type="number" data-id="${t.id}" class="chk-amount" value="${t.defaultAmount}" min="0" onwheel="this.blur()">
       </div>`
     )
     .join("");
@@ -126,6 +126,21 @@ export function initFixedUI({ onSaveTemplate, onDeleteTemplate, onRegisterEntrie
     opt.textContent = cat;
     categorySelect.appendChild(opt);
   }
+
+  // 마이너스 기호 즉시 제거 (기본 금액 입력)
+  const tplAmountInput = document.getElementById("tplAmount");
+  tplAmountInput.addEventListener("input", () => {
+    if (tplAmountInput.value.includes("-")) {
+      tplAmountInput.value = tplAmountInput.value.replace(/-/g, "");
+    }
+  });
+
+  // 이번 달 등록 체크리스트의 금액 입력도 마이너스 즉시 제거 (이벤트 위임)
+  document.getElementById("monthlyChecklist").addEventListener("input", (ev) => {
+    if (ev.target.classList.contains("chk-amount") && ev.target.value.includes("-")) {
+      ev.target.value = ev.target.value.replace(/-/g, "");
+    }
+  });
 
   // 담당자/결제수단 토글 버튼
   document.querySelectorAll(".tpl-writer-btn").forEach((btn) => {

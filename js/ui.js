@@ -51,19 +51,29 @@ export function renderSummary(totals, range) {
 /* ---------------- 내역 리스트 렌더링 ---------------- */
 
 let currentEntries = [];
+let entriesExpanded = false;
+const ENTRIES_PREVIEW_COUNT = 5;
 
 export function renderEntries(entries) {
   currentEntries = entries;
+  renderEntryListView();
+}
+
+function renderEntryListView() {
   const list = document.getElementById("entryList");
   const count = document.getElementById("entryCount");
-  count.textContent = `${entries.length}건`;
+  const toggleBtn = document.getElementById("toggleEntriesBtn");
+  const total = currentEntries.length;
+  count.textContent = `${total}건`;
 
-  if (entries.length === 0) {
+  if (total === 0) {
     list.innerHTML = `<p class="empty">선택한 기간에 기록된 지출이 없어요.</p>`;
+    toggleBtn.classList.add("hidden");
     return;
   }
 
-  list.innerHTML = entries
+  const visible = entriesExpanded ? currentEntries : currentEntries.slice(0, ENTRIES_PREVIEW_COUNT);
+  list.innerHTML = visible
     .map(
       (e) => `
       <div class="entry">
@@ -82,6 +92,13 @@ export function renderEntries(entries) {
       </div>`
     )
     .join("");
+
+  if (total > ENTRIES_PREVIEW_COUNT) {
+    toggleBtn.classList.remove("hidden");
+    toggleBtn.textContent = entriesExpanded ? "접기" : `전체보기 (총 ${total}건)`;
+  } else {
+    toggleBtn.classList.add("hidden");
+  }
 }
 
 function escapeHtml(str) {
@@ -174,6 +191,13 @@ export function initForm({ onSave, onUpdate }) {
   const saveBtn = document.getElementById("saveBtn");
   const cancelEditBtn = document.getElementById("cancelEditBtn");
 
+  // 마이너스 기호가 입력되는 즉시 제거 (min="0"만으로는 타이핑 자체를 막지 못함)
+  amountInput.addEventListener("input", () => {
+    if (amountInput.value.includes("-")) {
+      amountInput.value = amountInput.value.replace(/-/g, "");
+    }
+  });
+
   // 날짜 기본값: 오늘
   dateInput.value = todayStr();
 
@@ -244,6 +268,11 @@ export function initForm({ onSave, onUpdate }) {
  * 내역 리스트의 ✏️(수정)/🗑️(삭제) 버튼 처리.
  */
 export function initEntryList({ onDelete }) {
+  document.getElementById("toggleEntriesBtn").addEventListener("click", () => {
+    entriesExpanded = !entriesExpanded;
+    renderEntryListView();
+  });
+
   document.getElementById("entryList").addEventListener("click", async (ev) => {
     const btn = ev.target.closest("[data-action]");
     if (!btn) return;
