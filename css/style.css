@@ -24,21 +24,21 @@ body{
 .hidden{ display:none !important; }
 
 header{
-  padding:36px 20px 24px;
+  padding:16px 20px 12px;
   text-align:center;
   border-bottom:1px solid var(--line);
-  margin-bottom:24px;
+  margin-bottom:14px;
 }
 header .eyebrow{
-  font-size:12px;
-  letter-spacing:.18em;
+  font-size:10px;
+  letter-spacing:.16em;
   color:var(--ink-soft);
   text-transform:uppercase;
-  margin-bottom:6px;
+  margin-bottom:3px;
 }
 header h1{
   font-family:Georgia,'Noto Serif KR',serif;
-  font-size:28px;
+  font-size:20px;
   font-weight:600;
   color:var(--pine-dark);
 }
@@ -48,19 +48,19 @@ header h1{
 .summary{
   background:var(--pine-dark);
   color:#EDE8DA;
-  border-radius:18px;
-  padding:22px 22px 20px;
-  margin-bottom:20px;
+  border-radius:16px;
+  padding:14px 16px 12px;
+  margin-bottom:14px;
 }
 .summary .range-row{
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:10px;
-  margin-bottom:10px;
+  margin-bottom:6px;
 }
 .summary #rangeLabel{
-  font-size:13px;
+  font-size:12px;
   color:#C9C4B2;
 }
 .summary select{
@@ -68,14 +68,14 @@ header h1{
   border:1px solid #55625A;
   color:#EDE8DA;
   border-radius:8px;
-  padding:5px 8px;
-  font-size:13px;
+  padding:3px 7px;
+  font-size:12px;
 }
 .custom-range{
   display:flex;
   align-items:center;
   gap:6px;
-  margin-bottom:14px;
+  margin-bottom:8px;
 }
 .custom-range input[type=date]{
   flex:1;
@@ -83,8 +83,8 @@ header h1{
   background:transparent;
   color:#EDE8DA;
   border-radius:8px;
-  padding:6px 8px;
-  font-size:13px;
+  padding:5px 7px;
+  font-size:12px;
   color-scheme:dark;
 }
 .custom-range button{
@@ -92,21 +92,21 @@ header h1{
   background:var(--seonyeong);
   color:#fff;
   border-radius:8px;
-  padding:7px 12px;
-  font-size:13px;
+  padding:6px 11px;
+  font-size:12px;
   cursor:pointer;
 }
-.summary .total-label{ font-size:13px; color:#B7C4BC; margin-bottom:4px; }
+.summary .total-label{ font-size:11px; color:#B7C4BC; margin-bottom:1px; }
 .summary .total-amount{
   font-family:Georgia,serif;
-  font-size:34px;
+  font-size:24px;
   font-weight:600;
-  margin-bottom:16px;
+  margin-bottom:8px;
 }
-.summary .split-row{ display:flex; gap:10px; margin-bottom:12px; }
-.split-chip{ flex:1; background:rgba(255,255,255,0.07); border-radius:10px; padding:10px 12px; }
-.split-chip .k{ font-size:11px; color:#B7C4BC; margin-bottom:2px; }
-.split-chip .v{ font-size:16px; font-weight:600; }
+.summary .split-row{ display:flex; gap:8px; margin-bottom:6px; }
+.split-chip{ flex:1; background:rgba(255,255,255,0.07); border-radius:9px; padding:6px 10px; }
+.split-chip .k{ font-size:10px; color:#B7C4BC; margin-bottom:1px; }
+.split-chip .v{ font-size:14px; font-weight:600; }
 
 .dining-alert{
   display:flex;
@@ -115,15 +115,15 @@ header h1{
   gap:8px;
   background:rgba(255,255,255,0.07);
   border:1px solid rgba(255,255,255,0.12);
-  border-radius:10px;
-  padding:9px 12px;
-  margin-bottom:12px;
-  font-size:13px;
+  border-radius:9px;
+  padding:6px 10px;
+  margin-bottom:6px;
+  font-size:12px;
   transition:background .2s ease, border-color .2s ease, color .2s ease;
 }
 .dining-alert .label{ font-weight:600; }
 .dining-alert .amt{ font-weight:700; margin-left:auto; }
-.dining-alert .count{ font-size:11px; color:#B7C4BC; }
+.dining-alert .count{ font-size:10px; color:#B7C4BC; }
 .dining-alert.over{
   background:rgba(224,122,95,0.22);
   border-color:rgba(224,122,95,0.55);
@@ -131,9 +131,9 @@ header h1{
 }
 .dining-alert.over .count{ color:#F0C5B8; }
 
-.who-row{ display:flex; gap:8px; }
-.who-chip{ flex:1; text-align:center; border-radius:10px; padding:8px 6px; font-size:12px; }
-.who-chip .name{ font-weight:600; margin-bottom:2px; display:block; }
+.who-row{ display:flex; gap:6px; }
+.who-chip{ flex:1; text-align:center; border-radius:9px; padding:6px 4px; font-size:11px; }
+.who-chip .name{ font-weight:600; margin-bottom:1px; display:block; }
 .who-chip.seonyeong{ background:rgba(201,123,132,0.25); }
 .who-chip.hyunwoo{ background:rgba(76,122,140,0.25); }
 .who-chip.gongyong{ background:rgba(176,138,62,0.25); }
@@ -143,14 +143,15 @@ section.card{
   background:var(--card);
   border:1px solid var(--line);
   border-radius:16px;
-  padding:20px;
-  margin-bottom:20px;
+  padding:16px;
+  margin-bottom:16px;
 }
-.card h2{ font-size:14px; color:var(--ink-soft); letter-spacing:.04em; margin-bottom:14px; }
+.card h2{ font-size:14px; color:var(--ink-soft); letter-spacing:.04em; margin-bottom:12px; }
 
 /* 입력 폼 */
-.field{ margin-bottom:14px; }
-.field label{ display:block; font-size:12px; color:var(--ink-soft); margin-bottom:6px; }
+.field{ margin-bottom:12px; }
+.field label{ display:block; font-size:12px; color:var(--ink-soft); margin-bottom:5px; }
+.field label .optional{ color:#B0AEA4; font-weight:400; }
 .field input[type=date],
 .field input[type=text],
 .field input[type=number],
@@ -196,12 +197,6 @@ section.card{
   margin-top:6px;
 }
 .submit-btn:active{ background:var(--pine-dark); }
-.autosave-note{
-  text-align:center;
-  font-size:11px;
-  color:var(--ink-soft);
-  margin-top:8px;
-}
 
 /* 내역 리스트 */
 .list-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
@@ -218,6 +213,7 @@ section.card{
 .tag.gongyong{ background:var(--gongyong); }
 .entry .meta{ flex:1; min-width:0; }
 .entry .cat{ font-size:14px; font-weight:600; }
+.entry .memo{ font-size:12px; color:var(--ink-soft); margin-top:1px; }
 .entry .sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
 .entry .amt{ font-size:15px; font-weight:600; white-space:nowrap; }
 .entry .method{ font-size:11px; padding:3px 7px; border-radius:6px; background:var(--paper); color:var(--ink-soft); margin-left:6px; }
@@ -308,14 +304,14 @@ footer .fixed-link{
 /* 좁은 화면 (폴드8 커버 화면 등 ~360px) 최적화 */
 @media (max-width:380px){
   .wrap{ padding:0 14px; }
-  header{ padding:28px 14px 20px; }
-  header h1{ font-size:24px; }
-  .summary{ padding:18px 16px 16px; border-radius:16px; }
-  .summary .total-amount{ font-size:28px; }
-  .split-row{ gap:8px; }
-  .who-row{ gap:6px; }
-  .who-chip{ font-size:11px; padding:7px 4px; }
-  section.card{ padding:16px; }
+  header{ padding:12px 14px 10px; }
+  header h1{ font-size:18px; }
+  .summary{ padding:12px 14px 10px; border-radius:14px; }
+  .summary .total-amount{ font-size:21px; }
+  .split-row{ gap:6px; }
+  .who-row{ gap:5px; }
+  .who-chip{ font-size:10px; padding:5px 3px; }
+  section.card{ padding:13px; }
   .btn-toggle{ font-size:12px; padding:9px 4px; }
   .entry .cat{ font-size:13px; }
   .entry .amt{ font-size:14px; }

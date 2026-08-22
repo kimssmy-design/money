@@ -4,6 +4,7 @@
 
 import { CATEGORIES } from "./categories.js";
 import { showToast } from "./ui.js";
+import { todayStr } from "./dateUtil.js";
 
 const WRITER_LABEL = { seonyeong: "선영", hyunwoo: "현우", gongyong: "공용" };
 const METHOD_LABEL = { cash: "현금", card: "카드" };
@@ -13,10 +14,6 @@ let editingId = null; // null이면 "추가 모드", 값이 있으면 "수정 �
 
 function formatWon(n) {
   return `${Math.round(n).toLocaleString("ko-KR")}원`;
-}
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
 }
 
 function escapeHtml(str) {

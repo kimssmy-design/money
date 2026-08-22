@@ -37,10 +37,14 @@ export async function deleteTemplate(id) {
 /**
  * 등록된 고정비 템플릿을 실시간으로 구독.
  */
-export function subscribeTemplates(callback) {
+export function subscribeTemplates(callback, onError = console.error) {
   const q = query(templatesRef, orderBy("name"));
-  return onSnapshot(q, (snapshot) => {
-    const templates = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-    callback(templates);
-  });
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const templates = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      callback(templates);
+    },
+    onError
+  );
 }

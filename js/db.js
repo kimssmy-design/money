@@ -50,12 +50,25 @@ export async function deleteEntry(id) {
 /**
  * 전체 지출 내역을 실시간으로 구독.
  * 데이터가 추가/변경될 때마다 callback(entries배열) 이 자동으로 호출됨.
+ * date 한 필드만 정렬하고(복합 인덱스 불필요), 같은 날짜끼리는 저장 시각(createdAt) 기준으로
+ * 클라이언트에서 한 번 더 정렬함.
+ * onError: 실시간 연결 자체가 실패했을 때 호출됨(기본은 콘솔에만 기록).
  * 반환값(unsubscribe 함수)은 지금은 쓸 일이 없지만 나중에 필요하면 사용 가능.
  */
-export function subscribeEntries(callback) {
-  const q = query(entriesRef, orderBy("date", "desc"), orderBy("createdAt", "desc"));
-  return onSnapshot(q, (snapshot) => {
-    const entries = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    callback(entries);
-  });
+export function subscribeEntries(callback, onError = console.error) {
+  const q = query(entriesRef, orderBy("date", "desc"));
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const entries = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      entries.sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? 1 : -1; // 날짜 내림차순
+        const at = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const bt = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return bt - at; // 같은 날짜면 최근 저장한 게 위로
+      });
+      callback(entries);
+    },
+    onError
+  );
 }

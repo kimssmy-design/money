@@ -4,6 +4,7 @@
 
 import { DINING_WARNING_THRESHOLD } from "./summary.js";
 import { CATEGORIES } from "./categories.js";
+import { todayStr } from "./dateUtil.js";
 
 const WRITER_LABEL = { seonyeong: "선영", hyunwoo: "현우", gongyong: "공용" };
 const METHOD_LABEL = { cash: "현금", card: "카드" };
@@ -69,6 +70,7 @@ export function renderEntries(entries) {
         <div class="tag ${e.writer}"></div>
         <div class="meta">
           <div class="cat">${escapeHtml(e.category)}</div>
+          ${e.memo ? `<div class="memo">${escapeHtml(e.memo)}</div>` : ""}
           <div class="sub">${formatDateLabel(e.date)} · ${WRITER_LABEL[e.writer] ?? "?"}</div>
         </div>
         <div>
@@ -119,7 +121,7 @@ let formWriter = null;
 let editingEntryId = null;
 let saving = false;
 
-let dateInput, categoryInput, amountInput, methodBtns, writerBtns;
+let dateInput, categoryInput, memoInput, amountInput, methodBtns, writerBtns;
 
 function isReady() {
   const amount = Number(amountInput.value);
@@ -138,8 +140,9 @@ function setWriterActive(writer) {
 
 function resetFormFully() {
   editingEntryId = null;
-  dateInput.value = new Date().toISOString().slice(0, 10);
+  dateInput.value = todayStr();
   categoryInput.selectedIndex = 0;
+  memoInput.value = "";
   amountInput.value = "";
   setMethodActive("cash");
   setWriterActive(null);
@@ -153,6 +156,7 @@ function startEditingEntry(entry) {
   editingEntryId = entry.id;
   dateInput.value = entry.date;
   categoryInput.value = entry.category;
+  memoInput.value = entry.memo ?? "";
   amountInput.value = entry.amount;
   setMethodActive(entry.method);
   setWriterActive(entry.writer);
@@ -163,6 +167,7 @@ function startEditingEntry(entry) {
 export function initForm({ onSave, onUpdate }) {
   dateInput = document.getElementById("entryDate");
   categoryInput = document.getElementById("entryCategory");
+  memoInput = document.getElementById("entryMemo");
   amountInput = document.getElementById("entryAmount");
   methodBtns = Array.from(document.querySelectorAll(".method-btn"));
   writerBtns = Array.from(document.querySelectorAll(".writer-btn"));
@@ -170,7 +175,7 @@ export function initForm({ onSave, onUpdate }) {
   const cancelEditBtn = document.getElementById("cancelEditBtn");
 
   // 날짜 기본값: 오늘
-  dateInput.value = new Date().toISOString().slice(0, 10);
+  dateInput.value = todayStr();
 
   // 카테고리 옵션을 공통 목록(categories.js)에서 채움
   for (const cat of CATEGORIES) {
@@ -181,44 +186,25 @@ export function initForm({ onSave, onUpdate }) {
   }
 
   methodBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      setMethodActive(btn.dataset.method);
-      maybeAutoSave();
-    });
+    btn.addEventListener("click", () => setMethodActive(btn.dataset.method));
   });
 
   writerBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      setWriterActive(btn.dataset.writer);
-      maybeAutoSave();
-    });
+    btn.addEventListener("click", () => setWriterActive(btn.dataset.writer));
   });
 
-  // 금액/카테고리는 입력을 마쳤을 때(change: blur 또는 엔터)만 자동저장 검사
-  // → 타이핑 중간마다 저장하지 않도록 함
-  categoryInput.addEventListener("change", maybeAutoSave);
-  amountInput.addEventListener("change", maybeAutoSave);
-  amountInput.addEventListener("keydown", (ev) => {
-    if (ev.key === "Enter") amountInput.blur(); // 엔터 치면 change 이벤트 발생
-  });
-
-  saveBtn.addEventListener("click", () => trySave(true));
+  // 자동저장 없음 - "기록하기" 버튼을 눌러야만 저장/수정됨
+  saveBtn.addEventListener("click", () => trySave());
 
   cancelEditBtn.addEventListener("click", (ev) => {
     ev.preventDefault();
     resetFormFully();
   });
 
-  function maybeAutoSave() {
-    if (isReady()) trySave(false);
-  }
-
-  async function trySave(manual) {
+  async function trySave() {
     if (saving) return;
     if (!isReady()) {
-      if (manual) {
-        showToast(!formWriter ? "누가 썼는지 선택해주세요" : "카테고리와 금액을 입력해주세요");
-      }
+      showToast(!formWriter ? "누가 썼는지 선택해주세요" : "카테고리와 금액을 입력해주세요");
       return;
     }
 
@@ -226,6 +212,7 @@ export function initForm({ onSave, onUpdate }) {
     const entry = {
       date: dateInput.value,
       category: categoryInput.value.trim(),
+      memo: memoInput.value.trim(),
       amount: Number(amountInput.value),
       method: formMethod,
       writer: formWriter
@@ -239,8 +226,9 @@ export function initForm({ onSave, onUpdate }) {
       } else {
         await onSave(entry);
         showToast("저장됨 ✓");
-        // 다음 입력을 위해 카테고리/금액만 비움 (날짜, 결제수단, 작성자는 유지 → 같은 사람이 연달아 기록하기 편함)
+        // 다음 입력을 위해 카테고리/메모/금액만 비움 (날짜, 결제수단, 작성자는 유지 → 같은 사람이 연달아 기록하기 편함)
         categoryInput.selectedIndex = 0;
+        memoInput.value = "";
         amountInput.value = "";
       }
     } catch (err) {

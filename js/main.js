@@ -3,7 +3,7 @@
 
 import { addEntry, updateEntry, deleteEntry, subscribeEntries } from "./db.js";
 import { getPresetRange, filterByRange, computeTotals } from "./summary.js";
-import { renderSummary, renderEntries, initForm, initEntryList, initRangeControl } from "./ui.js";
+import { renderSummary, renderEntries, initForm, initEntryList, initRangeControl, showToast } from "./ui.js";
 import { addTemplate, updateTemplate, deleteTemplate, subscribeTemplates } from "./fixedTemplates.js";
 import { renderTemplates, initFixedUI } from "./fixedUI.js";
 
@@ -44,10 +44,16 @@ initEntryList({
 });
 
 // Firestore 데이터가 바뀔 때마다 (내가 쓰든, 남편이 쓰든) 실시간 반영
-subscribeEntries((entries) => {
-  allEntries = entries;
-  rerender();
-});
+subscribeEntries(
+  (entries) => {
+    allEntries = entries;
+    rerender();
+  },
+  (err) => {
+    console.error(err);
+    showToast("데이터를 불러오지 못했어요 - 새로고침 해보세요");
+  }
+);
 
 // 고정비 템플릿: 목록이 바뀔 때마다 화면 갱신
 subscribeTemplates((templates) => {
