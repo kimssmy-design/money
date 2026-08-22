@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>단하네 가계부</title>
+
+<!-- PWA 설정: 홈 화면 아이콘 + 주소창 없는 실행(standalone) -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#28362F">
+<link rel="icon" href="./icons/icon-192.png">
+
+<!-- iOS(사파리)에서도 홈 화면 추가 시 아이콘/주소창 없는 실행이 되도록 -->
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="단하네 가계부">
+
+<link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Household Ledger</div>
+  <h1>단하네 가계부</h1>
+</header>
+
+<div class="wrap">
+
+  <!-- 기간 요약 -->
+  <div class="summary">
+    <div class="range-row">
+      <span id="rangeLabel">-</span>
+      <select id="rangePreset">
+        <option value="thisMonth" selected>이번 달</option>
+        <option value="lastMonth">지난 달</option>
+        <option value="custom">기간 직접 선택</option>
+      </select>
+    </div>
+
+    <div id="customRangeWrap" class="custom-range hidden">
+      <input type="date" id="customStart">
+      <span>~</span>
+      <input type="date" id="customEnd">
+      <button id="customApply">적용</button>
+    </div>
+
+    <div class="total-label">선택 기간 총 지출</div>
+    <div class="total-amount" id="totalAmount">0원</div>
+
+    <div class="split-row">
+      <div class="split-chip"><div class="k">현금</div><div class="v" id="cashAmount">0원</div></div>
+      <div class="split-chip"><div class="k">카드</div><div class="v" id="cardAmount">0원</div></div>
+    </div>
+
+    <div class="who-row">
+      <div class="who-chip seonyeong"><span class="name">선영</span><span id="writerTotal-seonyeong">0원</span></div>
+      <div class="who-chip hyunwoo"><span class="name">현우</span><span id="writerTotal-hyunwoo">0원</span></div>
+      <div class="who-chip gongyong"><span class="name">공용</span><span id="writerTotal-gongyong">0원</span></div>
+    </div>
+  </div>
+
+  <!-- 입력 폼 -->
+  <section class="card">
+    <h2>지출 기록하기</h2>
+    <div class="field">
+      <label>날짜</label>
+      <input type="date" id="entryDate">
+    </div>
+    <div class="field">
+      <label>카테고리</label>
+      <input type="text" id="entryCategory" placeholder="예: 식비, 교통, 생활용품">
+    </div>
+    <div class="field">
+      <label>금액</label>
+      <input type="number" id="entryAmount" placeholder="0" inputmode="numeric">
+    </div>
+    <div class="field">
+      <label>결제수단</label>
+      <div class="btn-row">
+        <div class="btn-toggle method-btn active" data-method="cash">현금</div>
+        <div class="btn-toggle method-btn" data-method="card">카드</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>작성자</label>
+      <div class="btn-row">
+        <div class="btn-toggle writer-btn" data-writer="seonyeong">선영</div>
+        <div class="btn-toggle writer-btn" data-writer="hyunwoo">현우</div>
+        <div class="btn-toggle writer-btn" data-writer="gongyong">공용</div>
+      </div>
+    </div>
+    <button class="submit-btn" id="saveBtn">기록하기</button>
+    <div class="autosave-note">카테고리·금액·작성자를 모두 입력하면 자동으로 저장돼요</div>
+  </section>
+
+  <!-- 최근 내역 -->
+  <section class="card">
+    <div class="list-head">
+      <h2>선택 기간 내역</h2>
+      <span class="count" id="entryCount">0건</span>
+    </div>
+    <div id="entryList"></div>
+  </section>
+
+</div>
+
+<footer>
+  선영 · 현우 둘만의 가계부예요.
+</footer>
+
+<div id="toast"></div>
+
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
