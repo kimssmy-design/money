@@ -7,6 +7,9 @@ import {
   getFirestore,
   collection,
   addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
   onSnapshot,
   serverTimestamp,
   query,
@@ -16,7 +19,7 @@ import {
 import { firebaseConfig, ENTRIES_COLLECTION } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+export const db = getFirestore(app);
 const entriesRef = collection(db, ENTRIES_COLLECTION);
 
 /**
@@ -28,6 +31,20 @@ export async function addEntry(entry) {
     ...entry,
     createdAt: serverTimestamp() // 저장된 실제 시각(정렬용)
   });
+}
+
+/**
+ * 지출 항목 하나를 수정. entry는 addEntry와 동일한 형태(날짜/카테고리/금액/결제수단/작성자).
+ */
+export async function updateEntry(id, entry) {
+  await updateDoc(doc(db, ENTRIES_COLLECTION, id), entry);
+}
+
+/**
+ * 지출 항목 하나를 삭제.
+ */
+export async function deleteEntry(id) {
+  await deleteDoc(doc(db, ENTRIES_COLLECTION, id));
 }
 
 /**

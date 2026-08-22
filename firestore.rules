@@ -6,13 +6,25 @@ service cloud.firestore {
     // 대신 아래 조건으로 "가계부 항목 형식"이 아닌 데이터는 저장을 막아둠.
     match /entries/{entryId} {
       allow read: if true;
-      allow create: if
+      allow create, update: if
         request.resource.data.keys().hasAll(['date','category','amount','method','writer']) &&
         request.resource.data.amount is number &&
         request.resource.data.amount > 0 &&
         request.resource.data.method in ['cash','card'] &&
         request.resource.data.writer in ['seonyeong','hyunwoo','gongyong'];
-      allow update, delete: if false; // 앱에서 수정/삭제 기능을 아직 만들지 않았으므로 막아둠
+      allow delete: if true;
+    }
+
+    // fixedTemplates 컬렉션: 고정비 항목(템플릿). 추가/수정/삭제 모두 허용하되 형식은 검사.
+    match /fixedTemplates/{templateId} {
+      allow read: if true;
+      allow create, update: if
+        request.resource.data.keys().hasAll(['name','writer','category','method','defaultAmount']) &&
+        request.resource.data.defaultAmount is number &&
+        request.resource.data.defaultAmount > 0 &&
+        request.resource.data.method in ['cash','card'] &&
+        request.resource.data.writer in ['seonyeong','hyunwoo','gongyong'];
+      allow delete: if true;
     }
 
     // 그 외 모든 컬렉션은 기본적으로 차단

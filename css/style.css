@@ -207,8 +207,10 @@ section.card{
 .list-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
 .list-head h2{ font-size:14px; color:var(--ink-soft); letter-spacing:.04em; }
 .list-head .count{ font-size:12px; color:var(--ink-soft); }
+.editing-badge{ font-size:12px; color:var(--seonyeong); }
+.editing-badge a{ color:var(--ink-soft); text-decoration:underline; }
 
-.entry{ display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid var(--line); }
+.entry{ display:flex; align-items:center; gap:8px; padding:12px 4px; border-bottom:1px solid var(--line); }
 .entry:last-child{ border-bottom:none; }
 .entry .tag{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 .tag.seonyeong{ background:var(--seonyeong); }
@@ -219,9 +221,70 @@ section.card{
 .entry .sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
 .entry .amt{ font-size:15px; font-weight:600; white-space:nowrap; }
 .entry .method{ font-size:11px; padding:3px 7px; border-radius:6px; background:var(--paper); color:var(--ink-soft); margin-left:6px; }
+.entry .icon-btn{ flex-shrink:0; }
 .empty{ font-size:13px; color:var(--ink-soft); text-align:center; padding:20px 0; }
 
 footer{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:30px; padding:0 20px; line-height:1.6; }
+footer .fixed-link{
+  display:block;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--line);
+  color:var(--ink-soft);
+  text-decoration:none;
+  font-size:13px;
+}
+
+/* 고정비 화면 */
+#screenFixed{ max-width:920px; margin:0 auto; }
+.sub-header{
+  padding:20px 20px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:20px;
+}
+.sub-header .back{ font-size:20px; color:var(--pine-dark); cursor:pointer; padding:4px 6px; }
+.sub-header h1{ font-family:Georgia,'Noto Serif KR',serif; font-size:20px; color:var(--pine-dark); }
+
+.add-btn{
+  width:100%;
+  border:1px dashed var(--line);
+  background:transparent;
+  color:var(--ink-soft);
+  border-radius:10px;
+  padding:12px;
+  font-size:14px;
+  cursor:pointer;
+  margin-top:6px;
+}
+
+.template-form{ margin-top:16px; padding-top:16px; border-top:1px solid var(--line); }
+.template-form .btn-row{ gap:8px; }
+.ghost-btn{ background:transparent !important; color:var(--ink-soft) !important; border:1px solid var(--line) !important; }
+
+.tpl-row{ display:flex; align-items:center; gap:10px; padding:11px 4px; border-bottom:1px solid var(--line); }
+.tpl-row:last-child{ border-bottom:none; }
+.tpl-row .tag{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.tpl-row .meta{ flex:1; min-width:0; }
+.tpl-row .name{ font-size:14px; font-weight:600; }
+.tpl-row .sub{ font-size:11px; color:var(--ink-soft); margin-top:2px; }
+.tpl-row .amt{ font-size:14px; font-weight:600; margin-right:6px; white-space:nowrap; }
+.tpl-row .icon-btn{ font-size:14px; color:var(--ink-soft); padding:4px 6px; cursor:pointer; background:none; border:none; }
+.empty-hint{ font-size:13px; color:var(--ink-soft); padding:10px 0; }
+
+.month-hint{ font-size:12px; color:var(--ink-soft); margin-bottom:10px; line-height:1.5; }
+.check-row{ display:flex; align-items:center; gap:8px; padding:10px 4px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.check-row:last-child{ border-bottom:none; }
+.check-row input[type=checkbox]{ width:18px; height:18px; accent-color:var(--pine); flex-shrink:0; }
+.check-row .name{ flex:1; min-width:90px; font-size:13px; font-weight:600; }
+.check-row input[type=date]{
+  border:1px solid var(--line); border-radius:8px; padding:6px 8px; font-size:12px; width:130px;
+}
+.check-row input[type=number]{
+  border:1px solid var(--line); border-radius:8px; padding:7px 8px; font-size:14px; text-align:right; width:100px;
+}
 
 /* 토스트 */
 #toast{
@@ -258,16 +321,16 @@ footer{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:30p
   .entry .amt{ font-size:14px; }
 }
 
-/* 넓은 화면 (폴드8 펼친 화면 등 ~640px 이상) - 2단 레이아웃 */
+/* 넓은 화면 (폴드8 펼친 화면 등 ~640px 이상) - 2단 레이아웃 (메인 화면에만 적용) */
 @media (min-width:640px){
-  .wrap{
+  #screenMain .wrap{
     max-width:920px;
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:20px;
     align-items:start;
   }
-  .summary{ grid-column:1; }
-  section.card:nth-of-type(1){ grid-column:2; grid-row:1; margin-bottom:0; }
-  section.card:nth-of-type(2){ grid-column:1 / span 2; grid-row:2; }
+  #screenMain .summary{ grid-column:1; }
+  #screenMain section.card:nth-of-type(1){ grid-column:2; grid-row:1; margin-bottom:0; }
+  #screenMain section.card:nth-of-type(2){ grid-column:1 / span 2; grid-row:2; }
 }

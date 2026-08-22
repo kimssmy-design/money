@@ -20,6 +20,8 @@
 </head>
 <body>
 
+<div id="screenMain">
+
 <header>
   <div class="eyebrow">Household Ledger</div>
   <h1>단하네 가계부</h1>
@@ -68,7 +70,10 @@
 
   <!-- 입력 폼 -->
   <section class="card">
-    <h2>지출 기록하기</h2>
+    <div class="list-head">
+      <h2>지출 기록하기</h2>
+      <span id="editingBadge" class="editing-badge hidden">수정 중 · <a href="#" id="cancelEditBtn">취소</a></span>
+    </div>
     <div class="field">
       <label>날짜</label>
       <input type="date" id="entryDate">
@@ -77,14 +82,6 @@
       <label>카테고리</label>
       <select id="entryCategory">
         <option value="" disabled selected>카테고리 선택</option>
-        <option value="🛒생활">🛒생활</option>
-        <option value="🍽️외식·간식">🍽️외식·간식</option>
-        <option value="🧸단하">🧸단하</option>
-        <option value="👤개인">👤개인</option>
-        <option value="🚗교통">🚗교통</option>
-        <option value="🐱고양이">🐱고양이</option>
-        <option value="🧾고정비">🧾고정비</option>
-        <option value="💰금융">💰금융</option>
       </select>
     </div>
     <div class="field">
@@ -123,7 +120,71 @@
 
 <footer>
   선영 · 현우 둘만의 가계부예요.
+  <a href="#" id="openFixedScreen" class="fixed-link">🧾 고정비 관리</a>
 </footer>
+
+</div><!-- /#screenMain -->
+
+<div id="screenFixed" class="hidden">
+  <header class="sub-header">
+    <span class="back" id="backToMain">←</span>
+    <h1>고정비 관리</h1>
+  </header>
+
+  <div class="wrap">
+
+    <!-- 등록된 템플릿 목록 -->
+    <section class="card">
+      <h2>등록된 고정비 항목</h2>
+      <div id="templateList"></div>
+      <button class="add-btn" id="addTemplateBtn">+ 새 항목 추가</button>
+
+      <!-- 추가/수정 폼 (평소엔 숨김) -->
+      <div id="templateForm" class="template-form hidden">
+        <div class="field">
+          <label>이름</label>
+          <input type="text" id="tplName" placeholder="예: 주택담보대출 이자">
+        </div>
+        <div class="field">
+          <label>담당자</label>
+          <div class="btn-row">
+            <div class="btn-toggle tpl-writer-btn" data-writer="seonyeong">선영</div>
+            <div class="btn-toggle tpl-writer-btn" data-writer="hyunwoo">현우</div>
+            <div class="btn-toggle tpl-writer-btn" data-writer="gongyong">공용</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>카테고리</label>
+          <select id="tplCategory"></select>
+        </div>
+        <div class="field">
+          <label>결제수단</label>
+          <div class="btn-row">
+            <div class="btn-toggle tpl-method-btn active" data-method="cash">현금</div>
+            <div class="btn-toggle tpl-method-btn" data-method="card">카드</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>기본 금액</label>
+          <input type="number" id="tplAmount" placeholder="0" inputmode="numeric">
+        </div>
+        <div class="btn-row">
+          <button class="submit-btn ghost-btn" id="tplCancelBtn" type="button">취소</button>
+          <button class="submit-btn" id="tplSaveBtn" type="button">저장</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 이번 달 등록하기 -->
+    <section class="card">
+      <h2>이번 달 등록하기</h2>
+      <div class="month-hint">체크한 항목만 등록돼요. 날짜는 오늘로 기본 표시되고, 실제 나간 날짜·금액이 다르면 그 자리에서 고치세요.</div>
+      <div id="monthlyChecklist"></div>
+      <button class="submit-btn" id="registerCheckedBtn">체크한 0건 등록하기</button>
+    </section>
+
+  </div>
+</div>
 
 <div id="toast"></div>
 

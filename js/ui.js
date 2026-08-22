@@ -3,6 +3,7 @@
 // Firestore를 직접 건드리지 않고, "저장해야 할 때 콜백을 불러주는" 방식으로만 동작.
 
 import { DINING_WARNING_THRESHOLD } from "./summary.js";
+import { CATEGORIES } from "./categories.js";
 
 const WRITER_LABEL = { seonyeong: "선영", hyunwoo: "현우", gongyong: "공용" };
 const METHOD_LABEL = { cash: "현금", card: "카드" };
@@ -48,7 +49,10 @@ export function renderSummary(totals, range) {
 
 /* ---------------- 내역 리스트 렌더링 ---------------- */
 
+let currentEntries = [];
+
 export function renderEntries(entries) {
+  currentEntries = entries;
   const list = document.getElementById("entryList");
   const count = document.getElementById("entryCount");
   count.textContent = `${entries.length}건`;
@@ -71,6 +75,8 @@ export function renderEntries(entries) {
           <span class="amt">${formatWon(e.amount)}</span>
           <span class="method">${METHOD_LABEL[e.method] ?? ""}</span>
         </div>
+        <button class="icon-btn" data-action="edit" data-id="${e.id}" type="button">✏️</button>
+        <button class="icon-btn" data-action="delete" data-id="${e.id}" type="button">🗑️</button>
       </div>`
     )
     .join("");
@@ -106,35 +112,84 @@ export function initRangeControl(onChange) {
   });
 }
 
-/* ---------------- 입력 폼 + 자동저장 ---------------- */
+/* ---------------- 입력 폼 + 자동저장 + 수정 ---------------- */
 
-export function initForm(onSave) {
-  const dateInput = document.getElementById("entryDate");
-  const categoryInput = document.getElementById("entryCategory");
-  const amountInput = document.getElementById("entryAmount");
-  const methodBtns = Array.from(document.querySelectorAll(".method-btn"));
-  const writerBtns = Array.from(document.querySelectorAll(".writer-btn"));
+let formMethod = "cash";
+let formWriter = null;
+let editingEntryId = null;
+let saving = false;
+
+let dateInput, categoryInput, amountInput, methodBtns, writerBtns;
+
+function isReady() {
+  const amount = Number(amountInput.value);
+  return categoryInput.value.trim() !== "" && amount > 0 && formWriter !== null;
+}
+
+function setMethodActive(method) {
+  formMethod = method;
+  methodBtns.forEach((b) => b.classList.toggle("active", b.dataset.method === method));
+}
+
+function setWriterActive(writer) {
+  formWriter = writer;
+  writerBtns.forEach((b) => b.classList.toggle("active", b.dataset.writer === writer));
+}
+
+function resetFormFully() {
+  editingEntryId = null;
+  dateInput.value = new Date().toISOString().slice(0, 10);
+  categoryInput.selectedIndex = 0;
+  amountInput.value = "";
+  setMethodActive("cash");
+  setWriterActive(null);
+  document.getElementById("editingBadge").classList.add("hidden");
+}
+
+/**
+ * 내역 리스트에서 ✏️를 눌렀을 때: 폼에 해당 항목을 채우고 "수정 모드"로 전환.
+ */
+function startEditingEntry(entry) {
+  editingEntryId = entry.id;
+  dateInput.value = entry.date;
+  categoryInput.value = entry.category;
+  amountInput.value = entry.amount;
+  setMethodActive(entry.method);
+  setWriterActive(entry.writer);
+  document.getElementById("editingBadge").classList.remove("hidden");
+  document.getElementById("entryCategory").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+export function initForm({ onSave, onUpdate }) {
+  dateInput = document.getElementById("entryDate");
+  categoryInput = document.getElementById("entryCategory");
+  amountInput = document.getElementById("entryAmount");
+  methodBtns = Array.from(document.querySelectorAll(".method-btn"));
+  writerBtns = Array.from(document.querySelectorAll(".writer-btn"));
   const saveBtn = document.getElementById("saveBtn");
+  const cancelEditBtn = document.getElementById("cancelEditBtn");
 
   // 날짜 기본값: 오늘
   dateInput.value = new Date().toISOString().slice(0, 10);
 
-  let method = "cash";
-  let writer = null;
-  let saving = false;
+  // 카테고리 옵션을 공통 목록(categories.js)에서 채움
+  for (const cat of CATEGORIES) {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categoryInput.appendChild(opt);
+  }
 
   methodBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
-      method = btn.dataset.method;
-      methodBtns.forEach((b) => b.classList.toggle("active", b === btn));
+      setMethodActive(btn.dataset.method);
       maybeAutoSave();
     });
   });
 
   writerBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
-      writer = btn.dataset.writer;
-      writerBtns.forEach((b) => b.classList.toggle("active", b === btn));
+      setWriterActive(btn.dataset.writer);
       maybeAutoSave();
     });
   });
@@ -149,10 +204,10 @@ export function initForm(onSave) {
 
   saveBtn.addEventListener("click", () => trySave(true));
 
-  function isReady() {
-    const amount = Number(amountInput.value);
-    return categoryInput.value.trim() !== "" && amount > 0 && writer !== null;
-  }
+  cancelEditBtn.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    resetFormFully();
+  });
 
   function maybeAutoSave() {
     if (isReady()) trySave(false);
@@ -162,7 +217,7 @@ export function initForm(onSave) {
     if (saving) return;
     if (!isReady()) {
       if (manual) {
-        showToast(!writer ? "누가 썼는지 선택해주세요" : "카테고리와 금액을 입력해주세요");
+        showToast(!formWriter ? "누가 썼는지 선택해주세요" : "카테고리와 금액을 입력해주세요");
       }
       return;
     }
@@ -172,22 +227,49 @@ export function initForm(onSave) {
       date: dateInput.value,
       category: categoryInput.value.trim(),
       amount: Number(amountInput.value),
-      method,
-      writer
+      method: formMethod,
+      writer: formWriter
     };
 
     try {
-      await onSave(entry);
-      showToast("저장됨 ✓");
-      // 다음 입력을 위해 카테고리/금액만 비움 (날짜, 결제수단, 작성자는 유지 → 같은 사람이 연달아 기록하기 편함)
-      categoryInput.value = "";
-      amountInput.value = "";
-      categoryInput.focus();
+      if (editingEntryId) {
+        await onUpdate(editingEntryId, entry);
+        showToast("수정됨 ✓");
+        resetFormFully();
+      } else {
+        await onSave(entry);
+        showToast("저장됨 ✓");
+        // 다음 입력을 위해 카테고리/금액만 비움 (날짜, 결제수단, 작성자는 유지 → 같은 사람이 연달아 기록하기 편함)
+        categoryInput.selectedIndex = 0;
+        amountInput.value = "";
+      }
     } catch (err) {
       console.error(err);
-      showToast("저장 실패 - 인터넷 연결을 확인해주세요");
+      showToast(editingEntryId ? "수정 실패 - 인터넷 연결을 확인해주세요" : "저장 실패 - 인터넷 연결을 확인해주세요");
     } finally {
       saving = false;
     }
   }
+}
+
+/**
+ * 내역 리스트의 ✏️(수정)/🗑️(삭제) 버튼 처리.
+ */
+export function initEntryList({ onDelete }) {
+  document.getElementById("entryList").addEventListener("click", async (ev) => {
+    const btn = ev.target.closest("[data-action]");
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const entry = currentEntries.find((e) => e.id === id);
+    if (!entry) return;
+
+    if (btn.dataset.action === "edit") {
+      startEditingEntry(entry);
+    } else if (btn.dataset.action === "delete") {
+      if (confirm("이 지출 기록을 삭제할까요?")) {
+        await onDelete(id);
+        showToast("삭제됨");
+      }
+    }
+  });
 }
