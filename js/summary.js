@@ -36,16 +36,21 @@ export function filterByRange(entries, start, end) {
   return entries.filter((e) => e.date >= start && e.date <= end);
 }
 
+// 외식·간식 소계가 이 금액을 넘으면 경고 색으로 표시 (한 달 기준)
+export const DINING_WARNING_THRESHOLD = 200000;
+const DINING_CATEGORY = "🍽️외식·간식";
+
 /**
  * 필터링된 entries로 합계 계산.
- * 반환: { total, cash, card, byWriter: { seonyeong, hyunwoo, gongyong } }
+ * 반환: { total, cash, card, byWriter: {...}, dining: { amount, count } }
  */
 export function computeTotals(entries) {
   const result = {
     total: 0,
     cash: 0,
     card: 0,
-    byWriter: { seonyeong: 0, hyunwoo: 0, gongyong: 0 }
+    byWriter: { seonyeong: 0, hyunwoo: 0, gongyong: 0 },
+    dining: { amount: 0, count: 0 }
   };
 
   for (const e of entries) {
@@ -57,6 +62,11 @@ export function computeTotals(entries) {
 
     if (result.byWriter[e.writer] !== undefined) {
       result.byWriter[e.writer] += amount;
+    }
+
+    if (e.category === DINING_CATEGORY) {
+      result.dining.amount += amount;
+      result.dining.count += 1;
     }
   }
 

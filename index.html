@@ -53,6 +53,12 @@
       <div class="split-chip"><div class="k">카드</div><div class="v" id="cardAmount">0원</div></div>
     </div>
 
+    <div class="dining-alert" id="diningAlert">
+      <span class="label">🍽️외식·간식</span>
+      <span class="amt" id="diningAmount">0원</span>
+      <span class="count" id="diningCount">0건</span>
+    </div>
+
     <div class="who-row">
       <div class="who-chip seonyeong"><span class="name">선영</span><span id="writerTotal-seonyeong">0원</span></div>
       <div class="who-chip hyunwoo"><span class="name">현우</span><span id="writerTotal-hyunwoo">0원</span></div>
@@ -69,7 +75,17 @@
     </div>
     <div class="field">
       <label>카테고리</label>
-      <input type="text" id="entryCategory" placeholder="예: 식비, 교통, 생활용품">
+      <select id="entryCategory">
+        <option value="" disabled selected>카테고리 선택</option>
+        <option value="🛒생활">🛒생활</option>
+        <option value="🍽️외식·간식">🍽️외식·간식</option>
+        <option value="🧸단하">🧸단하</option>
+        <option value="👤개인">👤개인</option>
+        <option value="🚗교통">🚗교통</option>
+        <option value="🐱고양이">🐱고양이</option>
+        <option value="🧾고정비">🧾고정비</option>
+        <option value="💰금융">💰금융</option>
+      </select>
     </div>
     <div class="field">
       <label>금액</label>

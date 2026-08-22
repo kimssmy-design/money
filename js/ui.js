@@ -2,6 +2,8 @@
 // 역할: 화면 그리기 + 사용자 입력 처리(자동저장 포함).
 // Firestore를 직접 건드리지 않고, "저장해야 할 때 콜백을 불러주는" 방식으로만 동작.
 
+import { DINING_WARNING_THRESHOLD } from "./summary.js";
+
 const WRITER_LABEL = { seonyeong: "선영", hyunwoo: "현우", gongyong: "공용" };
 const METHOD_LABEL = { cash: "현금", card: "카드" };
 
@@ -37,6 +39,11 @@ export function renderSummary(totals, range) {
   document.getElementById("writerTotal-seonyeong").textContent = formatWon(totals.byWriter.seonyeong);
   document.getElementById("writerTotal-hyunwoo").textContent = formatWon(totals.byWriter.hyunwoo);
   document.getElementById("writerTotal-gongyong").textContent = formatWon(totals.byWriter.gongyong);
+
+  const diningAlert = document.getElementById("diningAlert");
+  document.getElementById("diningAmount").textContent = formatWon(totals.dining.amount);
+  document.getElementById("diningCount").textContent = `${totals.dining.count}건`;
+  diningAlert.classList.toggle("over", totals.dining.amount > DINING_WARNING_THRESHOLD);
 }
 
 /* ---------------- 내역 리스트 렌더링 ---------------- */

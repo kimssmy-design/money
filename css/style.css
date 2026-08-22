@@ -108,6 +108,29 @@ header h1{
 .split-chip .k{ font-size:11px; color:#B7C4BC; margin-bottom:2px; }
 .split-chip .v{ font-size:16px; font-weight:600; }
 
+.dining-alert{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:10px;
+  padding:9px 12px;
+  margin-bottom:12px;
+  font-size:13px;
+  transition:background .2s ease, border-color .2s ease, color .2s ease;
+}
+.dining-alert .label{ font-weight:600; }
+.dining-alert .amt{ font-weight:700; margin-left:auto; }
+.dining-alert .count{ font-size:11px; color:#B7C4BC; }
+.dining-alert.over{
+  background:rgba(224,122,95,0.22);
+  border-color:rgba(224,122,95,0.55);
+  color:#F6D9CF;
+}
+.dining-alert.over .count{ color:#F0C5B8; }
+
 .who-row{ display:flex; gap:8px; }
 .who-chip{ flex:1; text-align:center; border-radius:10px; padding:8px 6px; font-size:12px; }
 .who-chip .name{ font-weight:600; margin-bottom:2px; display:block; }
@@ -130,7 +153,8 @@ section.card{
 .field label{ display:block; font-size:12px; color:var(--ink-soft); margin-bottom:6px; }
 .field input[type=date],
 .field input[type=text],
-.field input[type=number]{
+.field input[type=number],
+.field select{
   width:100%;
   border:1px solid var(--line);
   background:#fff;
@@ -139,6 +163,8 @@ section.card{
   font-size:15px;
   color:var(--ink);
 }
+.field select:invalid,
+.field select option[value=""]{ color:var(--ink-soft); }
 .btn-row{ display:flex; gap:8px; }
 .btn-toggle{
   flex:1;
