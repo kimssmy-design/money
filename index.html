@@ -51,8 +51,8 @@
     <div class="total-amount" id="totalAmount">0원</div>
 
     <div class="split-row">
-      <div class="split-chip"><div class="k">현금</div><div class="v" id="cashAmount">0원</div></div>
-      <div class="split-chip"><div class="k">카드</div><div class="v" id="cardAmount">0원</div></div>
+      <div class="split-chip"><div class="k">현금·체크카드</div><div class="v" id="cashAmount">0원</div></div>
+      <div class="split-chip"><div class="k">신용카드</div><div class="v" id="cardAmount">0원</div></div>
     </div>
 
     <div class="dining-alert" id="diningAlert">
@@ -65,6 +65,11 @@
       <div class="who-chip seonyeong"><span class="name">선영</span><span id="writerTotal-seonyeong">0원</span></div>
       <div class="who-chip hyunwoo"><span class="name">현우</span><span id="writerTotal-hyunwoo">0원</span></div>
       <div class="who-chip gongyong"><span class="name">공용</span><span id="writerTotal-gongyong">0원</span></div>
+    </div>
+
+    <div class="streak-row">
+      <div class="streak-chip seonyeong">🔥 선영 <span id="streakSeonyeong">0</span>일 <span id="badgeSeonyeong"></span></div>
+      <div class="streak-chip hyunwoo">🔥 현우 <span id="streakHyunwoo">0</span>일 <span id="badgeHyunwoo"></span></div>
     </div>
   </div>
 
@@ -95,8 +100,8 @@
     <div class="field">
       <label>결제수단</label>
       <div class="btn-row">
-        <div class="btn-toggle method-btn active" data-method="cash">현금</div>
-        <div class="btn-toggle method-btn" data-method="card">카드</div>
+        <div class="btn-toggle method-btn active" data-method="cash">현금·체크카드</div>
+        <div class="btn-toggle method-btn" data-method="card">신용카드</div>
       </div>
     </div>
     <div class="field">
@@ -105,6 +110,13 @@
         <div class="btn-toggle writer-btn" data-writer="seonyeong">선영</div>
         <div class="btn-toggle writer-btn" data-writer="hyunwoo">현우</div>
         <div class="btn-toggle writer-btn" data-writer="gongyong">공용</div>
+      </div>
+    </div>
+    <div class="field hidden" id="loggedByField">
+      <label>실제 기록자 <span class="optional">(스트릭 반영용)</span></label>
+      <div class="btn-row">
+        <div class="btn-toggle loggedby-btn" data-loggedby="seonyeong">선영</div>
+        <div class="btn-toggle loggedby-btn" data-loggedby="hyunwoo">현우</div>
       </div>
     </div>
     <button class="submit-btn" id="saveBtn">기록하기</button>
@@ -157,6 +169,13 @@
             <div class="btn-toggle tpl-writer-btn" data-writer="gongyong">공용</div>
           </div>
         </div>
+        <div class="field hidden" id="tplLoggedByField">
+          <label>실제 기록자 <span class="optional">(스트릭 반영용)</span></label>
+          <div class="btn-row">
+            <div class="btn-toggle tpl-loggedby-btn" data-loggedby="seonyeong">선영</div>
+            <div class="btn-toggle tpl-loggedby-btn" data-loggedby="hyunwoo">현우</div>
+          </div>
+        </div>
         <div class="field">
           <label>카테고리</label>
           <select id="tplCategory"></select>
@@ -164,8 +183,8 @@
         <div class="field">
           <label>결제수단</label>
           <div class="btn-row">
-            <div class="btn-toggle tpl-method-btn active" data-method="cash">현금</div>
-            <div class="btn-toggle tpl-method-btn" data-method="card">카드</div>
+            <div class="btn-toggle tpl-method-btn active" data-method="cash">현금·체크카드</div>
+            <div class="btn-toggle tpl-method-btn" data-method="card">신용카드</div>
           </div>
         </div>
         <div class="field">

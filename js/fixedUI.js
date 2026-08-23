@@ -7,7 +7,7 @@ import { showToast } from "./ui.js";
 import { todayStr } from "./dateUtil.js";
 
 const WRITER_LABEL = { seonyeong: "선영", hyunwoo: "현우", gongyong: "공용" };
-const METHOD_LABEL = { cash: "현금", card: "카드" };
+const METHOD_LABEL = { cash: "현금·체크카드", card: "신용카드" };
 
 let currentTemplates = [];
 let editingId = null; // null이면 "추가 모드", 값이 있으면 "수정 모드"
@@ -92,6 +92,8 @@ function resetForm() {
   document.getElementById("tplCategory").selectedIndex = 0;
   document.querySelectorAll(".tpl-writer-btn").forEach((b) => b.classList.remove("active"));
   document.querySelectorAll(".tpl-method-btn").forEach((b) => b.classList.toggle("active", b.dataset.method === "cash"));
+  document.querySelectorAll(".tpl-loggedby-btn").forEach((b) => b.classList.remove("active"));
+  document.getElementById("tplLoggedByField").classList.add("hidden");
 }
 
 function openFormForAdd() {
@@ -107,6 +109,10 @@ function openFormForEdit(t) {
   document.getElementById("tplCategory").value = t.category;
   document.querySelectorAll(".tpl-writer-btn").forEach((b) => b.classList.toggle("active", b.dataset.writer === t.writer));
   document.querySelectorAll(".tpl-method-btn").forEach((b) => b.classList.toggle("active", b.dataset.method === t.method));
+  if (t.writer === "gongyong") {
+    document.getElementById("tplLoggedByField").classList.remove("hidden");
+    document.querySelectorAll(".tpl-loggedby-btn").forEach((b) => b.classList.toggle("active", b.dataset.loggedby === t.loggedBy));
+  }
   document.getElementById("templateForm").classList.remove("hidden");
 }
 
@@ -142,10 +148,22 @@ export function initFixedUI({ onSaveTemplate, onDeleteTemplate, onRegisterEntrie
     }
   });
 
-  // 담당자/결제수단 토글 버튼
+  // 담당자/결제수단/실제 기록자 토글 버튼
   document.querySelectorAll(".tpl-writer-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tpl-writer-btn").forEach((b) => b.classList.toggle("active", b === btn));
+      const loggedByField = document.getElementById("tplLoggedByField");
+      if (btn.dataset.writer === "gongyong") {
+        loggedByField.classList.remove("hidden");
+      } else {
+        loggedByField.classList.add("hidden");
+        document.querySelectorAll(".tpl-loggedby-btn").forEach((b) => b.classList.remove("active"));
+      }
+    });
+  });
+  document.querySelectorAll(".tpl-loggedby-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tpl-loggedby-btn").forEach((b) => b.classList.toggle("active", b === btn));
     });
   });
   document.querySelectorAll(".tpl-method-btn").forEach((btn) => {
@@ -163,9 +181,14 @@ export function initFixedUI({ onSaveTemplate, onDeleteTemplate, onRegisterEntrie
     const category = document.getElementById("tplCategory").value;
     const writerBtn = document.querySelector(".tpl-writer-btn.active");
     const methodBtn = document.querySelector(".tpl-method-btn.active");
+    const loggedByBtn = document.querySelector(".tpl-loggedby-btn.active");
 
     if (!name || !category || !writerBtn || !amount) {
       showToast("이름·담당자·카테고리·금액을 모두 입력해주세요");
+      return;
+    }
+    if (writerBtn.dataset.writer === "gongyong" && !loggedByBtn) {
+      showToast("실제 기록자를 선택해주세요");
       return;
     }
 
@@ -174,7 +197,8 @@ export function initFixedUI({ onSaveTemplate, onDeleteTemplate, onRegisterEntrie
       writer: writerBtn.dataset.writer,
       category,
       method: methodBtn.dataset.method,
-      defaultAmount: amount
+      defaultAmount: amount,
+      loggedBy: writerBtn.dataset.writer === "gongyong" ? loggedByBtn.dataset.loggedby : writerBtn.dataset.writer
     };
 
     try {
@@ -228,7 +252,8 @@ export function initFixedUI({ onSaveTemplate, onDeleteTemplate, onRegisterEntrie
         category: tpl.category,
         amount: Number(amountInput.value),
         method: tpl.method,
-        writer: tpl.writer
+        writer: tpl.writer,
+        loggedBy: tpl.writer === "gongyong" ? tpl.loggedBy : tpl.writer
       };
     });
 

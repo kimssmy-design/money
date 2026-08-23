@@ -12,7 +12,8 @@ service cloud.firestore {
         request.resource.data.amount > 0 &&
         request.resource.data.method in ['cash','card'] &&
         request.resource.data.writer in ['seonyeong','hyunwoo','gongyong'] &&
-        (!('memo' in request.resource.data) || request.resource.data.memo is string);
+        (!('memo' in request.resource.data) || request.resource.data.memo is string) &&
+        (!('loggedBy' in request.resource.data) || request.resource.data.loggedBy in ['seonyeong','hyunwoo']);
       allow delete: if true;
     }
 

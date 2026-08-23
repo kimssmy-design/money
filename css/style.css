@@ -138,6 +138,19 @@ header h1{
 .who-chip.hyunwoo{ background:rgba(76,122,140,0.25); }
 .who-chip.gongyong{ background:rgba(176,138,62,0.25); }
 
+.streak-row{ display:flex; gap:6px; margin-top:6px; }
+.streak-chip{
+  flex:1;
+  text-align:center;
+  border-radius:9px;
+  padding:5px 4px;
+  font-size:11px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+}
+.streak-chip.seonyeong{ color:#F0CDD2; }
+.streak-chip.hyunwoo{ color:#C9E1EA; }
+
 /* 카드 공통 */
 section.card{
   background:var(--card);

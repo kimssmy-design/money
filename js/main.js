@@ -3,7 +3,8 @@
 
 import { addEntry, updateEntry, deleteEntry, subscribeEntries } from "./db.js";
 import { getPresetRange, filterByRange, computeTotals } from "./summary.js";
-import { renderSummary, renderEntries, initForm, initEntryList, initRangeControl, showToast } from "./ui.js";
+import { renderSummary, renderEntries, initForm, initEntryList, initRangeControl, renderStreaks, showToast } from "./ui.js";
+import { computeStreaks } from "./streak.js";
 import { addTemplate, updateTemplate, deleteTemplate, subscribeTemplates } from "./fixedTemplates.js";
 import { renderTemplates, initFixedUI } from "./fixedUI.js";
 
@@ -48,6 +49,7 @@ subscribeEntries(
   (entries) => {
     allEntries = entries;
     rerender();
+    renderStreaks(computeStreaks(allEntries));
   },
   (err) => {
     console.error(err);

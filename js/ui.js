@@ -5,9 +5,10 @@
 import { DINING_WARNING_THRESHOLD } from "./summary.js";
 import { CATEGORIES } from "./categories.js";
 import { todayStr } from "./dateUtil.js";
+import { getBadge } from "./streak.js";
 
 const WRITER_LABEL = { seonyeong: "선영", hyunwoo: "현우", gongyong: "공용" };
-const METHOD_LABEL = { cash: "현금", card: "카드" };
+const METHOD_LABEL = { cash: "현금", card: "카드" }; // 내역 리스트의 작은 태그용 축약 표기 (전체 이름은 입력 버튼·요약 카드에서 사용)
 
 function formatWon(n) {
   return `${Math.round(n).toLocaleString("ko-KR")}원`;
@@ -46,6 +47,16 @@ export function renderSummary(totals, range) {
   document.getElementById("diningAmount").textContent = formatWon(totals.dining.amount);
   document.getElementById("diningCount").textContent = `${totals.dining.count}건`;
   diningAlert.classList.toggle("over", totals.dining.amount > DINING_WARNING_THRESHOLD);
+}
+
+/**
+ * 선영/현우 연속 기록일수 + 뱃지 표시. 기간 선택과 무관하게 전체 기록 기준.
+ */
+export function renderStreaks(streaks) {
+  document.getElementById("streakSeonyeong").textContent = streaks.seonyeong;
+  document.getElementById("badgeSeonyeong").textContent = getBadge(streaks.seonyeong);
+  document.getElementById("streakHyunwoo").textContent = streaks.hyunwoo;
+  document.getElementById("badgeHyunwoo").textContent = getBadge(streaks.hyunwoo);
 }
 
 /* ---------------- 내역 리스트 렌더링 ---------------- */
@@ -135,14 +146,16 @@ export function initRangeControl(onChange) {
 
 let formMethod = "cash";
 let formWriter = null;
+let formLoggedBy = null;
 let editingEntryId = null;
 let saving = false;
 
-let dateInput, categoryInput, memoInput, amountInput, methodBtns, writerBtns;
+let dateInput, categoryInput, memoInput, amountInput, methodBtns, writerBtns, loggedByBtns;
 
 function isReady() {
   const amount = Number(amountInput.value);
-  return categoryInput.value.trim() !== "" && amount > 0 && formWriter !== null;
+  const loggedByOk = formWriter !== "gongyong" || formLoggedBy !== null;
+  return categoryInput.value.trim() !== "" && amount > 0 && formWriter !== null && loggedByOk;
 }
 
 function setMethodActive(method) {
@@ -150,9 +163,22 @@ function setMethodActive(method) {
   methodBtns.forEach((b) => b.classList.toggle("active", b.dataset.method === method));
 }
 
+function setLoggedByActive(loggedBy) {
+  formLoggedBy = loggedBy;
+  loggedByBtns.forEach((b) => b.classList.toggle("active", b.dataset.loggedby === loggedBy));
+}
+
 function setWriterActive(writer) {
   formWriter = writer;
   writerBtns.forEach((b) => b.classList.toggle("active", b.dataset.writer === writer));
+
+  const loggedByField = document.getElementById("loggedByField");
+  if (writer === "gongyong") {
+    loggedByField.classList.remove("hidden");
+  } else {
+    loggedByField.classList.add("hidden");
+    setLoggedByActive(null);
+  }
 }
 
 function resetFormFully() {
@@ -177,6 +203,9 @@ function startEditingEntry(entry) {
   amountInput.value = entry.amount;
   setMethodActive(entry.method);
   setWriterActive(entry.writer);
+  if (entry.writer === "gongyong") {
+    setLoggedByActive(entry.loggedBy ?? null);
+  }
   document.getElementById("editingBadge").classList.remove("hidden");
   document.getElementById("entryCategory").scrollIntoView({ behavior: "smooth", block: "center" });
 }
@@ -188,6 +217,7 @@ export function initForm({ onSave, onUpdate }) {
   amountInput = document.getElementById("entryAmount");
   methodBtns = Array.from(document.querySelectorAll(".method-btn"));
   writerBtns = Array.from(document.querySelectorAll(".writer-btn"));
+  loggedByBtns = Array.from(document.querySelectorAll(".loggedby-btn"));
   const saveBtn = document.getElementById("saveBtn");
   const cancelEditBtn = document.getElementById("cancelEditBtn");
 
@@ -217,6 +247,10 @@ export function initForm({ onSave, onUpdate }) {
     btn.addEventListener("click", () => setWriterActive(btn.dataset.writer));
   });
 
+  loggedByBtns.forEach((btn) => {
+    btn.addEventListener("click", () => setLoggedByActive(btn.dataset.loggedby));
+  });
+
   // 자동저장 없음 - "기록하기" 버튼을 눌러야만 저장/수정됨
   saveBtn.addEventListener("click", () => trySave());
 
@@ -228,7 +262,13 @@ export function initForm({ onSave, onUpdate }) {
   async function trySave() {
     if (saving) return;
     if (!isReady()) {
-      showToast(!formWriter ? "누가 썼는지 선택해주세요" : "카테고리와 금액을 입력해주세요");
+      if (!formWriter) {
+        showToast("누가 썼는지 선택해주세요");
+      } else if (formWriter === "gongyong" && !formLoggedBy) {
+        showToast("실제 기록자를 선택해주세요");
+      } else {
+        showToast("카테고리와 금액을 입력해주세요");
+      }
       return;
     }
 
@@ -239,7 +279,8 @@ export function initForm({ onSave, onUpdate }) {
       memo: memoInput.value.trim(),
       amount: Number(amountInput.value),
       method: formMethod,
-      writer: formWriter
+      writer: formWriter,
+      loggedBy: formWriter === "gongyong" ? formLoggedBy : formWriter
     };
 
     try {
