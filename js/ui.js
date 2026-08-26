@@ -6,6 +6,7 @@ import { DINING_WARNING_THRESHOLD } from "./summary.js";
 import { CATEGORIES } from "./categories.js";
 import { todayStr } from "./dateUtil.js";
 import { getBadge } from "./streak.js";
+import { getNoSpendBadge } from "./noSpendStreak.js";
 
 const WRITER_LABEL = { seonyeong: "선영", hyunwoo: "현우", gongyong: "공용" };
 const METHOD_LABEL = { cash: "현금", card: "카드" }; // 내역 리스트의 작은 태그용 축약 표기 (전체 이름은 입력 버튼·요약 카드에서 사용)
@@ -47,6 +48,9 @@ export function renderSummary(totals, range) {
   document.getElementById("diningAmount").textContent = formatWon(totals.dining.amount);
   document.getElementById("diningCount").textContent = `${totals.dining.count}건`;
   diningAlert.classList.toggle("over", totals.dining.amount > DINING_WARNING_THRESHOLD);
+
+  document.getElementById("groceryAmount").textContent = formatWon(totals.grocery.amount);
+  document.getElementById("groceryCount").textContent = `${totals.grocery.count}건`;
 }
 
 /**
@@ -57,6 +61,14 @@ export function renderStreaks(streaks) {
   document.getElementById("badgeSeonyeong").textContent = getBadge(streaks.seonyeong);
   document.getElementById("streakHyunwoo").textContent = streaks.hyunwoo;
   document.getElementById("badgeHyunwoo").textContent = getBadge(streaks.hyunwoo);
+}
+
+/**
+ * 가계부 전체(부부 공동) 무지출 연속일수 표시.
+ */
+export function renderNoSpendStreak(streak) {
+  document.getElementById("noSpendStreak").textContent = streak;
+  document.getElementById("noSpendBadge").textContent = getNoSpendBadge(streak);
 }
 
 /* ---------------- 내역 리스트 렌더링 ---------------- */

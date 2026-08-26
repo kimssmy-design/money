@@ -3,8 +3,10 @@
 
 import { addEntry, updateEntry, deleteEntry, subscribeEntries } from "./db.js";
 import { getPresetRange, filterByRange, computeTotals } from "./summary.js";
-import { renderSummary, renderEntries, initForm, initEntryList, initRangeControl, renderStreaks, showToast } from "./ui.js";
+import { renderSummary, renderEntries, initForm, initEntryList, initRangeControl, renderStreaks, renderNoSpendStreak, showToast } from "./ui.js";
 import { computeStreaks } from "./streak.js";
+import { computeNoSpendStreak } from "./noSpendStreak.js";
+import { buildEntriesText } from "./exportText.js";
 import { addTemplate, updateTemplate, deleteTemplate, subscribeTemplates } from "./fixedTemplates.js";
 import { renderTemplates, initFixedUI } from "./fixedUI.js";
 
@@ -44,12 +46,27 @@ initEntryList({
   }
 });
 
+// "복사" 버튼: 현재 선택된 기간의 전체 내역을 텍스트로 클립보드에 복사 (AI 분석 등에 붙여넣기용)
+document.getElementById("copyEntriesBtn").addEventListener("click", async () => {
+  const filtered = filterByRange(allEntries, currentRange.start, currentRange.end);
+  const text = buildEntriesText(filtered, currentRange, computeTotals(filtered));
+
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("복사됨 ✓");
+  } catch (err) {
+    console.error(err);
+    showToast("복사 실패 - 브라우저 권한을 확인해주세요");
+  }
+});
+
 // Firestore 데이터가 바뀔 때마다 (내가 쓰든, 남편이 쓰든) 실시간 반영
 subscribeEntries(
   (entries) => {
     allEntries = entries;
     rerender();
     renderStreaks(computeStreaks(allEntries));
+    renderNoSpendStreak(computeNoSpendStreak(allEntries));
   },
   (err) => {
     console.error(err);

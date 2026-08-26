@@ -61,6 +61,12 @@
       <span class="count" id="diningCount">0건</span>
     </div>
 
+    <div class="dining-alert" id="groceryAlert">
+      <span class="label">🛒생활</span>
+      <span class="amt" id="groceryAmount">0원</span>
+      <span class="count" id="groceryCount">0건</span>
+    </div>
+
     <div class="who-row">
       <div class="who-chip seonyeong"><span class="name">선영</span><span id="writerTotal-seonyeong">0원</span></div>
       <div class="who-chip hyunwoo"><span class="name">현우</span><span id="writerTotal-hyunwoo">0원</span></div>
@@ -70,6 +76,10 @@
     <div class="streak-row">
       <div class="streak-chip seonyeong">🔥 선영 <span id="streakSeonyeong">0</span>일 <span id="badgeSeonyeong"></span></div>
       <div class="streak-chip hyunwoo">🔥 현우 <span id="streakHyunwoo">0</span>일 <span id="badgeHyunwoo"></span></div>
+    </div>
+
+    <div class="nospend-row" id="noSpendRow">
+      🌿 무지출 <span id="noSpendStreak">0</span>일째 <span id="noSpendBadge"></span>
     </div>
   </div>
 
@@ -126,7 +136,10 @@
   <section class="card">
     <div class="list-head">
       <h2>선택 기간 내역</h2>
-      <span class="count" id="entryCount">0건</span>
+      <div class="list-head-right">
+        <span class="count" id="entryCount">0건</span>
+        <button class="copy-btn" id="copyEntriesBtn" type="button">📋 복사</button>
+      </div>
     </div>
     <div id="entryList"></div>
     <button class="toggle-entries-btn hidden" id="toggleEntriesBtn" type="button"></button>

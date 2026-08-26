@@ -3,25 +3,16 @@
 // 규칙: 하루 정도 건너뛰어도 스트릭이 끊기지 않음(하루 공백 허용).
 //       단, 이틀 이상 연속으로 기록이 없으면 끊김.
 
+import { dateStrToDayNumber, todayDayNumber } from "./dateUtil.js";
+
 export const STREAK_WRITERS = ["seonyeong", "hyunwoo"];
 export const BADGE_SILVER_DAYS = 7;
 export const BADGE_GOLD_DAYS = 30;
 
-function toDayNumber(dateStr) {
-  // "YYYY-MM-DD" → 1970-01-01부터 며칠째인지(정수). 문자열 파싱이라 시간대 영향 없음.
-  const [y, m, d] = dateStr.split("-").map(Number);
-  return Math.floor(Date.UTC(y, m - 1, d) / 86400000);
-}
-
-function todayDayNumber() {
-  const now = new Date();
-  return Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
-}
-
 function computeStreakForDates(dateStrings) {
   if (dateStrings.length === 0) return 0;
 
-  const dayNums = [...new Set(dateStrings.map(toDayNumber))].sort((a, b) => b - a); // 최신순
+  const dayNums = [...new Set(dateStrings.map(dateStrToDayNumber))].sort((a, b) => b - a); // 최신순
   const today = todayDayNumber();
 
   // 가장 최근 기록이 오늘 기준 이틀(=하루 공백까지만 허용) 넘게 지났으면 스트릭은 이미 끊긴 것
