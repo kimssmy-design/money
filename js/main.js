@@ -35,7 +35,8 @@ function rerenderStats() {
     prevTotal,
     byWriter: totals.byWriter,
     categoryBreakdown: computeCategoryBreakdown(filtered),
-    monthlyAvg: computeMonthlyAverage(allEntries)
+    monthlyAvg: computeMonthlyAverage(allEntries),
+    entries: filtered
   });
 }
 

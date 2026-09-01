@@ -4,8 +4,23 @@
 
 const WRITER_LABEL = { seonyeong: "선영", hyunwoo: "현우", gongyong: "공용" };
 
+let currentStatsEntries = [];
+let currentBreakdown = [];
+const expandedCategories = new Set();
+
 function formatWon(n) {
   return `${Math.round(n).toLocaleString("ko-KR")}원`;
+}
+
+function formatDateLabel(dateStr) {
+  const [, m, d] = dateStr.split("-");
+  return `${Number(m)}.${Number(d)}`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
 }
 
 /**
@@ -42,6 +57,19 @@ export function initStatsUI(onRangeChange) {
   customApply.addEventListener("click", () => {
     if (!customStart.value || !customEnd.value) return;
     onRangeChange({ preset: "custom", start: customStart.value, end: customEnd.value });
+  });
+
+  // 카테고리 행 클릭 → 그 카테고리의 지출 내역 펼치기/접기
+  document.getElementById("categoryBreakdownList").addEventListener("click", (ev) => {
+    const row = ev.target.closest(".cat-bar-row");
+    if (!row) return;
+    const category = row.dataset.category;
+    if (expandedCategories.has(category)) {
+      expandedCategories.delete(category);
+    } else {
+      expandedCategories.add(category);
+    }
+    renderCategoryList();
   });
 }
 
@@ -80,26 +108,10 @@ export function renderStats(data) {
     avgEl.textContent = "데이터가 더 쌓이면 계산돼요 (완료된 달이 아직 없어요)";
   }
 
-  // 카테고리별 지출 (숫자 + 막대그래프)
-  const catList = document.getElementById("categoryBreakdownList");
-  const nonZero = data.categoryBreakdown.filter((c) => c.amount > 0);
-  if (nonZero.length === 0) {
-    catList.innerHTML = `<p class="empty-hint">선택한 기간에 기록된 지출이 없어요.</p>`;
-  } else {
-    catList.innerHTML = nonZero
-      .map(
-        (c) => `
-        <div class="cat-bar-row">
-          <div class="cat-bar-top">
-            <span class="cat-name">${c.category}</span>
-            <span class="cat-amt">${formatWon(c.amount)} (${c.percent.toFixed(1)}%)</span>
-          </div>
-          <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${c.percent}%"></div></div>
-          <div class="cat-bar-count">${c.count}건</div>
-        </div>`
-      )
-      .join("");
-  }
+  // 카테고리별 지출 (숫자 + 막대그래프 + 클릭시 내역 펼치기)
+  currentStatsEntries = data.entries;
+  currentBreakdown = data.categoryBreakdown;
+  renderCategoryList();
 
   // 작성자별 지출
   const writerList = document.getElementById("writerBreakdownList");
@@ -112,5 +124,53 @@ export function renderStats(data) {
         <div class="amt">${formatWon(data.byWriter[w])}</div>
       </div>`
     )
+    .join("");
+}
+
+function renderCategoryList() {
+  const catList = document.getElementById("categoryBreakdownList");
+  const nonZero = currentBreakdown.filter((c) => c.amount > 0);
+
+  if (nonZero.length === 0) {
+    catList.innerHTML = `<p class="empty-hint">선택한 기간에 기록된 지출이 없어요.</p>`;
+    return;
+  }
+
+  catList.innerHTML = nonZero
+    .map((c) => {
+      const isOpen = expandedCategories.has(c.category);
+      const rowHtml = `
+        <div class="cat-bar-row" data-category="${c.category}">
+          <div class="cat-bar-top">
+            <span class="cat-name">${c.category} <span class="chevron">${isOpen ? "▲" : "▼"}</span></span>
+            <span class="cat-amt">${formatWon(c.amount)} (${c.percent.toFixed(1)}%)</span>
+          </div>
+          <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${c.percent}%"></div></div>
+          <div class="cat-bar-count">${c.count}건</div>
+        </div>`;
+
+      if (!isOpen) return rowHtml;
+
+      const detailEntries = currentStatsEntries
+        .filter((e) => e.category === c.category)
+        .sort((a, b) => (a.date < b.date ? 1 : -1));
+
+      const detailHtml = `
+        <div class="cat-detail">
+          ${detailEntries
+            .map(
+              (e) => `
+            <div class="cat-detail-row">
+              <span class="d-date">${formatDateLabel(e.date)}</span>
+              <span class="d-memo">${escapeHtml(e.memo) || "-"}</span>
+              <span class="d-writer">${WRITER_LABEL[e.writer] ?? ""}</span>
+              <span class="d-amt">${formatWon(e.amount)}</span>
+            </div>`
+            )
+            .join("")}
+        </div>`;
+
+      return rowHtml + detailHtml;
+    })
     .join("");
 }
