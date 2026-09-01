@@ -49,6 +49,7 @@
 
     <div class="total-label">선택 기간 총 지출</div>
     <div class="total-amount" id="totalAmount">0원</div>
+    <a href="#" id="openStatsScreen" class="stats-link">📊 이번달 지출 통계분석 보기</a>
 
     <div class="split-row">
       <div class="split-chip"><div class="k">현금·체크카드</div><div class="v" id="cashAmount">0원</div></div>
@@ -220,7 +221,54 @@
     </section>
 
   </div>
-</div>
+</div><!-- /#screenFixed -->
+
+<div id="screenStats" class="hidden">
+  <header class="sub-header">
+    <span class="back" id="backToMainFromStats">←</span>
+    <h1>지출 통계분석</h1>
+  </header>
+
+  <div class="wrap">
+
+    <section class="card">
+      <div class="stats-range-row">
+        <span id="statsRangeLabel">-</span>
+        <select id="statsRangePreset" class="stats-select">
+          <option value="thisMonth" selected>이번 달</option>
+          <option value="lastMonth">지난 달</option>
+          <option value="custom">기간 직접 선택</option>
+        </select>
+      </div>
+      <div id="statsCustomRangeWrap" class="stats-custom-range hidden">
+        <input type="date" id="statsCustomStart">
+        <span>~</span>
+        <input type="date" id="statsCustomEnd">
+        <button id="statsCustomApply" type="button">적용</button>
+      </div>
+
+      <div class="stats-total-label">선택 기간 총 지출</div>
+      <div class="stats-total-amount" id="statsTotalAmount">0원</div>
+      <div class="stats-compare" id="statsCompare">직전 같은 기간 대비 -</div>
+    </section>
+
+    <section class="card">
+      <h2>월평균 (완료된 달 기준)</h2>
+      <div class="stats-avg" id="statsAvgAmount">데이터가 더 쌓이면 계산돼요</div>
+    </section>
+
+    <section class="card">
+      <h2>카테고리별 지출</h2>
+      <div id="categoryBreakdownList"></div>
+    </section>
+
+    <section class="card">
+      <h2>작성자별 지출</h2>
+      <div id="writerBreakdownList"></div>
+    </section>
+
+  </div>
+</div><!-- /#screenStats -->
 
 <div id="toast"></div>
 
