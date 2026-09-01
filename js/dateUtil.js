@@ -24,3 +24,12 @@ export function dateStrToDayNumber(dateStr) {
 export function todayDayNumber() {
   return dateStrToDayNumber(todayStr());
 }
+
+/** dateStrToDayNumber의 역변환: 일련번호 → "YYYY-MM-DD" 문자열 */
+export function dayNumberToDateStr(dayNum) {
+  const d = new Date(dayNum * 86400000);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
