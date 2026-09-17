@@ -138,3 +138,11 @@ if ("serviceWorker" in navigator) {
     });
   });
 }
+
+// 오프라인 상태 배너: 인터넷 끊기면 안내 문구 표시, 다시 연결되면 숨김
+function updateOfflineBanner() {
+  document.getElementById("offlineBanner").classList.toggle("hidden", navigator.onLine);
+}
+window.addEventListener("online", updateOfflineBanner);
+window.addEventListener("offline", updateOfflineBanner);
+updateOfflineBanner();
