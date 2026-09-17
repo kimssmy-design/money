@@ -33,7 +33,8 @@ export function renderTemplates(templates) {
 
 function renderTemplateList(templates) {
   const list = document.getElementById("templateList");
-  document.getElementById("templateListCount").textContent = `${templates.length}개`;
+  const countEl = document.getElementById("templateListCount");
+  if (countEl) countEl.textContent = `${templates.length}개`;
 
   if (templates.length === 0) {
     list.innerHTML = `<p class="empty-hint">아직 등록된 고정비 항목이 없어요. 아래 버튼으로 추가해보세요.</p>`;
@@ -185,12 +186,27 @@ export function initFixedUI({ onSaveTemplate, onDeleteTemplate, onRegisterEntrie
   document.getElementById("addTemplateBtn").addEventListener("click", openFormForAdd);
   document.getElementById("tplCancelBtn").addEventListener("click", closeForm);
 
-  // 등록된 고정비 항목 목록 접기/펼치기 (기본값: 접힘)
-  document.getElementById("templateListToggle").addEventListener("click", () => {
-    const list = document.getElementById("templateList");
-    const isHidden = list.classList.toggle("hidden");
-    document.getElementById("templateListChevron").textContent = isHidden ? "▼" : "▲";
+  // 화면 전환 (메인 ↔ 고정비 관리) - 다른 요소보다 먼저 등록해서, 아래쪽 요소가 없어도 화면 전환은 항상 되게 함
+  document.getElementById("openFixedScreen").addEventListener("click", (ev) => {
+    ev.preventDefault();
+    document.getElementById("screenMain").classList.add("hidden");
+    document.getElementById("screenFixed").classList.remove("hidden");
   });
+  document.getElementById("backToMain").addEventListener("click", () => {
+    document.getElementById("screenFixed").classList.add("hidden");
+    document.getElementById("screenMain").classList.remove("hidden");
+  });
+
+  // 등록된 고정비 항목 목록 접기/펼치기 (기본값: 접힘) - 요소가 없는 예전 버전 배포와 섞여도 안전하게
+  const templateListToggle = document.getElementById("templateListToggle");
+  if (templateListToggle) {
+    templateListToggle.addEventListener("click", () => {
+      const list = document.getElementById("templateList");
+      const isHidden = list.classList.toggle("hidden");
+      const chevron = document.getElementById("templateListChevron");
+      if (chevron) chevron.textContent = isHidden ? "▼" : "▲";
+    });
+  }
 
   document.getElementById("tplSaveBtn").addEventListener("click", async () => {
     const name = document.getElementById("tplName").value.trim();
@@ -283,16 +299,5 @@ export function initFixedUI({ onSaveTemplate, onDeleteTemplate, onRegisterEntrie
       console.error(err);
       showToast("등록 실패 - 인터넷 연결을 확인해주세요");
     }
-  });
-
-  // 화면 전환 (메인 ↔ 고정비 관리)
-  document.getElementById("openFixedScreen").addEventListener("click", (ev) => {
-    ev.preventDefault();
-    document.getElementById("screenMain").classList.add("hidden");
-    document.getElementById("screenFixed").classList.remove("hidden");
-  });
-  document.getElementById("backToMain").addEventListener("click", () => {
-    document.getElementById("screenFixed").classList.add("hidden");
-    document.getElementById("screenMain").classList.remove("hidden");
   });
 }
