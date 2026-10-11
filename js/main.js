@@ -3,41 +3,19 @@
 
 import { addEntry, updateEntry, deleteEntry, subscribeEntries } from "./db.js";
 import { getPresetRange, filterByRange, computeTotals } from "./summary.js";
-import { renderSummary, renderEntries, initForm, initEntryList, initRangeControl, renderStreaks, renderNoSpendStreak, showToast } from "./ui.js";
+import { renderSummary, renderEntries, initForm, initEntryList, initRangeControl, renderStreaks, showToast } from "./ui.js";
 import { computeStreaks } from "./streak.js";
-import { computeNoSpendStreak } from "./noSpendStreak.js";
 import { buildEntriesText } from "./exportText.js";
-import { computeCategoryBreakdown, computePreviousPeriod, computeMonthlyAverage } from "./stats.js";
-import { initStatsUI, renderStats } from "./statsUI.js";
 import { addTemplate, updateTemplate, deleteTemplate, subscribeTemplates } from "./fixedTemplates.js";
 import { renderTemplates, initFixedUI } from "./fixedUI.js";
 
 let allEntries = [];
 let currentRange = getPresetRange("thisMonth");
-let statsRange = getPresetRange("thisMonth");
 
 function rerender() {
   const filtered = filterByRange(allEntries, currentRange.start, currentRange.end);
   renderSummary(computeTotals(filtered), currentRange);
   renderEntries(filtered);
-}
-
-function rerenderStats() {
-  const filtered = filterByRange(allEntries, statsRange.start, statsRange.end);
-  const totals = computeTotals(filtered);
-
-  const prevRange = computePreviousPeriod(statsRange);
-  const prevTotal = computeTotals(filterByRange(allEntries, prevRange.start, prevRange.end)).total;
-
-  renderStats({
-    range: statsRange,
-    total: totals.total,
-    prevTotal,
-    byWriter: totals.byWriter,
-    categoryBreakdown: computeCategoryBreakdown(filtered),
-    monthlyAvg: computeMonthlyAverage(allEntries),
-    entries: filtered
-  });
 }
 
 // 기간 선택이 바뀌면 range를 다시 계산하고 화면 갱신
@@ -47,15 +25,6 @@ initRangeControl((choice) => {
       ? { start: choice.start, end: choice.end }
       : getPresetRange(choice.preset);
   rerender();
-});
-
-// 통계분석 화면의 기간 선택
-initStatsUI((choice) => {
-  statsRange =
-    choice.preset === "custom"
-      ? { start: choice.start, end: choice.end }
-      : getPresetRange(choice.preset);
-  rerenderStats();
 });
 
 // 입력 폼에서 저장/수정이 필요할 때 Firestore에 실제로 반영
@@ -95,9 +64,7 @@ subscribeEntries(
   (entries) => {
     allEntries = entries;
     rerender();
-    rerenderStats();
     renderStreaks(computeStreaks(allEntries));
-    renderNoSpendStreak(computeNoSpendStreak(allEntries));
   },
   (err) => {
     console.error(err);
@@ -138,11 +105,3 @@ if ("serviceWorker" in navigator) {
     });
   });
 }
-
-// 오프라인 상태 배너: 인터넷 끊기면 안내 문구 표시, 다시 연결되면 숨김
-function updateOfflineBanner() {
-  document.getElementById("offlineBanner").classList.toggle("hidden", navigator.onLine);
-}
-window.addEventListener("online", updateOfflineBanner);
-window.addEventListener("offline", updateOfflineBanner);
-updateOfflineBanner();

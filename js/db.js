@@ -4,9 +4,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 import {
-  initializeFirestore,
-  persistentLocalCache,
-  persistentMultipleTabManager,
+  getFirestore,
   collection,
   addDoc,
   updateDoc,
@@ -21,14 +19,7 @@ import {
 import { firebaseConfig, ENTRIES_COLLECTION } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
-
-// 오프라인 캐시 켜기: 인터넷이 끊긴 상태에서 "기록하기"를 눌러도 기기에 임시 저장되고,
-// 화면에도 바로 반영됨. 인터넷이 다시 연결되면 자동으로 서버와 동기화됨.
-// persistentMultipleTabManager: 한 기기에서 앱을 여러 탭/창으로 동시에 열어도 충돌 안 나게 함.
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-});
-
+export const db = getFirestore(app);
 const entriesRef = collection(db, ENTRIES_COLLECTION);
 
 /**

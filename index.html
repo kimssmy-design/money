@@ -7,13 +7,13 @@
 
 <!-- PWA 설정: 홈 화면 아이콘 + 주소창 없는 실행(standalone) -->
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#28362F">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="icon" href="./icons/icon-192.png">
 
 <!-- iOS(사파리)에서도 홈 화면 추가 시 아이콘/주소창 없는 실행이 되도록 -->
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="단하네 가계부">
 
 <link rel="stylesheet" href="./css/style.css">
@@ -22,255 +22,212 @@
 
 <div id="screenMain">
 
-<div id="offlineBanner" class="offline-banner hidden">📴 오프라인 상태예요 - 입력은 기기에 저장되고, 인터넷이 연결되면 자동으로 동기화돼요</div>
+  <header class="app-header">
+    <h1>단하네 가계부</h1>
+    <select id="rangePreset" class="range-select" aria-label="기간 선택">
+      <option value="thisMonth" selected>이번 달</option>
+      <option value="lastMonth">지난 달</option>
+      <option value="custom">기간 직접 선택</option>
+    </select>
+  </header>
 
-<header>
-  <div class="eyebrow">Household Ledger</div>
-  <h1>단하네 가계부</h1>
-</header>
-
-<div class="wrap">
-
-  <!-- 기간 요약 -->
-  <div class="summary">
-    <div class="range-row">
-      <span id="rangeLabel">-</span>
-      <select id="rangePreset">
-        <option value="thisMonth" selected>이번 달</option>
-        <option value="lastMonth">지난 달</option>
-        <option value="custom">기간 직접 선택</option>
-      </select>
-    </div>
-
-    <div id="customRangeWrap" class="custom-range hidden">
-      <input type="date" id="customStart">
-      <span>~</span>
-      <input type="date" id="customEnd">
-      <button id="customApply">적용</button>
-    </div>
-
-    <div class="total-label">선택 기간 총 지출</div>
-    <div class="total-amount" id="totalAmount">0원</div>
-    <a href="#" id="openStatsScreen" class="stats-link">📊 이번달 지출 통계분석 보기</a>
-
-    <div class="split-row">
-      <div class="split-chip"><div class="k">현금·체크카드</div><div class="v" id="cashAmount">0원</div></div>
-      <div class="split-chip"><div class="k">신용카드</div><div class="v" id="cardAmount">0원</div></div>
-    </div>
-
-    <div class="dining-alert" id="diningAlert">
-      <span class="label">🍽️외식·간식</span>
-      <span class="amt" id="diningAmount">0원</span>
-      <span class="count" id="diningCount">0건</span>
-    </div>
-
-    <div class="dining-alert" id="groceryAlert">
-      <span class="label">🛒생활</span>
-      <span class="amt" id="groceryAmount">0원</span>
-      <span class="count" id="groceryCount">0건</span>
-    </div>
-
-    <div class="who-row">
-      <div class="who-chip seonyeong"><span class="name">선영</span><span id="writerTotal-seonyeong">0원</span></div>
-      <div class="who-chip hyunwoo"><span class="name">현우</span><span id="writerTotal-hyunwoo">0원</span></div>
-      <div class="who-chip gongyong"><span class="name">공용</span><span id="writerTotal-gongyong">0원</span></div>
-    </div>
-
-    <div class="streak-row">
-      <div class="streak-chip seonyeong">🔥 선영 <span id="streakSeonyeong">0</span>일 <span id="badgeSeonyeong"></span></div>
-      <div class="streak-chip hyunwoo">🔥 현우 <span id="streakHyunwoo">0</span>일 <span id="badgeHyunwoo"></span></div>
-    </div>
-
-    <div class="nospend-row" id="noSpendRow">
-      🌿 무지출 <span id="noSpendStreak">0</span>일째 <span id="noSpendBadge"></span>
-    </div>
+  <div id="customRangeWrap" class="custom-range hidden">
+    <input type="date" id="customStart" aria-label="시작일">
+    <span>~</span>
+    <input type="date" id="customEnd" aria-label="종료일">
+    <button id="customApply" type="button">적용</button>
   </div>
 
-  <!-- 입력 폼 -->
-  <section class="card">
-    <div class="list-head">
-      <h2>지출 기록하기</h2>
-      <span id="editingBadge" class="editing-badge hidden">수정 중 · <a href="#" id="cancelEditBtn">취소</a></span>
-    </div>
-    <div class="field">
-      <label>날짜</label>
-      <input type="date" id="entryDate">
-    </div>
-    <div class="field">
-      <label>카테고리</label>
-      <select id="entryCategory">
-        <option value="" disabled selected>카테고리 선택</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>구체적인 내용 <span class="optional">(선택)</span></label>
-      <input type="text" id="entryMemo" placeholder="예: 스타벅스, 쿠팡 생수 2박스">
-    </div>
-    <div class="field">
-      <label>금액</label>
-      <input type="number" id="entryAmount" placeholder="0" inputmode="numeric" min="0" onwheel="this.blur()">
-    </div>
-    <div class="field">
-      <label>결제수단</label>
-      <div class="btn-row">
-        <div class="btn-toggle method-btn active" data-method="cash">현금·체크카드</div>
-        <div class="btn-toggle method-btn" data-method="card">신용카드</div>
-      </div>
-    </div>
-    <div class="field">
-      <label>작성자</label>
-      <div class="btn-row">
-        <div class="btn-toggle writer-btn" data-writer="seonyeong">선영</div>
-        <div class="btn-toggle writer-btn" data-writer="hyunwoo">현우</div>
-        <div class="btn-toggle writer-btn" data-writer="gongyong">공용</div>
-      </div>
-    </div>
-    <div class="field hidden" id="loggedByField">
-      <label>실제 기록자 <span class="optional">(스트릭 반영용)</span></label>
-      <div class="btn-row">
-        <div class="btn-toggle loggedby-btn" data-loggedby="seonyeong">선영</div>
-        <div class="btn-toggle loggedby-btn" data-loggedby="hyunwoo">현우</div>
-      </div>
-    </div>
-    <button class="submit-btn" id="saveBtn">기록하기</button>
-  </section>
+  <div class="layout">
 
-  <!-- 최근 내역 -->
-  <section class="card">
-    <div class="list-head">
-      <h2>선택 기간 내역</h2>
-      <div class="list-head-right">
-        <span class="count" id="entryCount">0건</span>
-        <button class="copy-btn" id="copyEntriesBtn" type="button">📋 복사</button>
+    <!-- 왼쪽(폰에서는 전체): 요약 + 내역 -->
+    <main class="main-col">
+
+      <section class="summary">
+        <div class="range-label" id="rangeLabel">-</div>
+        <div class="total-label">선택 기간 지출</div>
+        <div class="total-amount" id="totalAmount">0원</div>
+
+        <div class="stat-grid three">
+          <div class="stat"><div class="k">선영</div><div class="v" id="writerTotal-seonyeong">0원</div></div>
+          <div class="stat"><div class="k">현우</div><div class="v" id="writerTotal-hyunwoo">0원</div></div>
+          <div class="stat"><div class="k">공용</div><div class="v" id="writerTotal-gongyong">0원</div></div>
+        </div>
+
+        <div class="stat-grid two">
+          <div class="stat"><div class="k">현금·체크카드</div><div class="v" id="cashAmount">0원</div></div>
+          <div class="stat"><div class="k">신용카드</div><div class="v" id="cardAmount">0원</div></div>
+        </div>
+
+        <!-- 외식·간식 예산 막대 (20만원 초과 시 .over) -->
+        <div class="budget" id="diningAlert">
+          <div class="budget-head">
+            <span class="label">🍽️외식·간식</span>
+            <span class="amt"><b id="diningAmount">0원</b> / 200,000원</span>
+          </div>
+          <div class="bar"><div class="bar-fill" id="diningBar"></div></div>
+          <div class="budget-foot">
+            <span id="diningMsg"></span>
+            <span id="diningCount">0건</span>
+          </div>
+        </div>
+
+        <div class="sub-stat" id="groceryAlert">
+          <span class="label">🛒생활</span>
+          <span><b id="groceryAmount">0원</b> · <span id="groceryCount">0건</span></span>
+        </div>
+
+        <div class="streak-row">
+          <div class="streak-chip">🔥 선영 <b id="streakSeonyeong">0</b>일 <span id="badgeSeonyeong"></span></div>
+          <div class="streak-chip">🔥 현우 <b id="streakHyunwoo">0</b>일 <span id="badgeHyunwoo"></span></div>
+        </div>
+      </section>
+
+      <section class="list-section">
+        <div class="list-head">
+          <h2>기록 <span class="count" id="entryCount">0건</span></h2>
+          <button class="text-btn" id="copyEntriesBtn" type="button">📋 복사</button>
+        </div>
+        <div id="entryList"></div>
+        <button class="toggle-entries-btn hidden" id="toggleEntriesBtn" type="button"></button>
+
+        <a href="#" id="openFixedScreen" class="fixed-link">고정비 관리 ›</a>
+      </section>
+
+    </main>
+
+    <!-- 오른쪽(폰에서는 +버튼으로 여는 시트): 입력 폼 -->
+    <aside id="entryPanel" class="entry-panel" aria-label="지출 기록하기">
+      <div class="panel-head">
+        <h2 id="panelTitle">새 기록</h2>
+        <span id="editingBadge" class="editing-badge hidden">수정 중 · <a href="#" id="cancelEditBtn">취소</a></span>
+        <button class="close-btn" id="closePanelBtn" type="button" aria-label="닫기">✕</button>
       </div>
-    </div>
-    <div id="entryList"></div>
-    <button class="toggle-entries-btn hidden" id="toggleEntriesBtn" type="button"></button>
-  </section>
 
-</div>
+      <div class="field">
+        <label for="entryDate">날짜</label>
+        <input type="date" id="entryDate">
+      </div>
 
-<footer>
-  선영 · 현우 둘만의 가계부예요.
-  <a href="#" id="openFixedScreen" class="fixed-link">🧾 고정비 관리</a>
-</footer>
+      <div class="field">
+        <label for="entryAmount">금액</label>
+        <div class="amount-wrap">
+          <input type="number" id="entryAmount" placeholder="0" inputmode="numeric" min="0" onwheel="this.blur()">
+          <span class="won">원</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>카테고리</label>
+        <div class="chip-grid" id="categoryChips"></div>
+      </div>
+
+      <div class="field">
+        <label for="entryMemo">내용 <span class="optional">(선택)</span></label>
+        <input type="text" id="entryMemo" placeholder="뭐 샀는지 적어주세요 (예: 마트 장보기)">
+      </div>
+
+      <div class="field">
+        <label>작성자</label>
+        <div class="seg">
+          <button type="button" class="btn-toggle writer-btn" data-writer="seonyeong">선영</button>
+          <button type="button" class="btn-toggle writer-btn" data-writer="hyunwoo">현우</button>
+          <button type="button" class="btn-toggle writer-btn" data-writer="gongyong">공용</button>
+        </div>
+      </div>
+
+      <div class="field hidden" id="loggedByField">
+        <label>실제 기록자 <span class="optional">(스트릭 반영용)</span></label>
+        <div class="seg">
+          <button type="button" class="btn-toggle loggedby-btn" data-loggedby="seonyeong">선영</button>
+          <button type="button" class="btn-toggle loggedby-btn" data-loggedby="hyunwoo">현우</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>결제수단</label>
+        <div class="seg">
+          <button type="button" class="btn-toggle method-btn active" data-method="cash">현금·체크카드</button>
+          <button type="button" class="btn-toggle method-btn" data-method="card">신용카드</button>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="saveBtn" type="button">저장</button>
+    </aside>
+
+  </div>
+
+  <button id="openPanelBtn" class="fab" type="button" aria-label="기록 추가">+</button>
 
 </div><!-- /#screenMain -->
 
 <div id="screenFixed" class="hidden">
   <header class="sub-header">
-    <span class="back" id="backToMain">←</span>
+    <button class="back" id="backToMain" type="button" aria-label="뒤로">‹</button>
     <h1>고정비 관리</h1>
   </header>
 
   <div class="wrap">
 
+    <!-- 이번 달 등록하기 -->
+    <section class="card">
+      <h2>이번 달 등록하기</h2>
+      <div class="month-hint">체크한 항목만 등록돼요. 실제 나간 날짜·금액이 다르면 그 자리에서 고치세요.</div>
+      <div id="monthlyChecklist"></div>
+      <button class="submit-btn" id="registerCheckedBtn" type="button">체크한 0건 등록하기</button>
+    </section>
+
     <!-- 등록된 템플릿 목록 -->
     <section class="card">
       <h2>등록된 고정비 항목</h2>
       <div id="templateList"></div>
-      <button class="add-btn" id="addTemplateBtn">+ 새 항목 추가</button>
+      <button class="add-btn" id="addTemplateBtn" type="button">+ 새 항목 추가</button>
 
       <!-- 추가/수정 폼 (평소엔 숨김) -->
       <div id="templateForm" class="template-form hidden">
         <div class="field">
-          <label>이름</label>
+          <label for="tplName">이름</label>
           <input type="text" id="tplName" placeholder="예: 주택담보대출 이자">
         </div>
         <div class="field">
           <label>담당자</label>
-          <div class="btn-row">
-            <div class="btn-toggle tpl-writer-btn" data-writer="seonyeong">선영</div>
-            <div class="btn-toggle tpl-writer-btn" data-writer="hyunwoo">현우</div>
-            <div class="btn-toggle tpl-writer-btn" data-writer="gongyong">공용</div>
+          <div class="seg">
+            <button type="button" class="btn-toggle tpl-writer-btn" data-writer="seonyeong">선영</button>
+            <button type="button" class="btn-toggle tpl-writer-btn" data-writer="hyunwoo">현우</button>
+            <button type="button" class="btn-toggle tpl-writer-btn" data-writer="gongyong">공용</button>
           </div>
         </div>
         <div class="field hidden" id="tplLoggedByField">
           <label>실제 기록자 <span class="optional">(스트릭 반영용)</span></label>
-          <div class="btn-row">
-            <div class="btn-toggle tpl-loggedby-btn" data-loggedby="seonyeong">선영</div>
-            <div class="btn-toggle tpl-loggedby-btn" data-loggedby="hyunwoo">현우</div>
+          <div class="seg">
+            <button type="button" class="btn-toggle tpl-loggedby-btn" data-loggedby="seonyeong">선영</button>
+            <button type="button" class="btn-toggle tpl-loggedby-btn" data-loggedby="hyunwoo">현우</button>
           </div>
         </div>
         <div class="field">
-          <label>카테고리</label>
+          <label for="tplCategory">카테고리</label>
           <select id="tplCategory"></select>
         </div>
         <div class="field">
           <label>결제수단</label>
-          <div class="btn-row">
-            <div class="btn-toggle tpl-method-btn active" data-method="cash">현금·체크카드</div>
-            <div class="btn-toggle tpl-method-btn" data-method="card">신용카드</div>
+          <div class="seg">
+            <button type="button" class="btn-toggle tpl-method-btn active" data-method="cash">현금·체크카드</button>
+            <button type="button" class="btn-toggle tpl-method-btn" data-method="card">신용카드</button>
           </div>
         </div>
         <div class="field">
-          <label>기본 금액</label>
+          <label for="tplAmount">기본 금액</label>
           <input type="number" id="tplAmount" placeholder="0" inputmode="numeric" min="0" onwheel="this.blur()">
         </div>
-        <div class="btn-row">
+        <div class="form-actions">
           <button class="submit-btn ghost-btn" id="tplCancelBtn" type="button">취소</button>
           <button class="submit-btn" id="tplSaveBtn" type="button">저장</button>
         </div>
       </div>
     </section>
 
-    <!-- 이번 달 등록하기 -->
-    <section class="card">
-      <h2>이번 달 등록하기</h2>
-      <div class="month-hint">체크한 항목만 등록돼요. 날짜는 오늘로 기본 표시되고, 실제 나간 날짜·금액이 다르면 그 자리에서 고치세요.</div>
-      <div id="monthlyChecklist"></div>
-      <button class="submit-btn" id="registerCheckedBtn">체크한 0건 등록하기</button>
-    </section>
-
   </div>
-</div><!-- /#screenFixed -->
-
-<div id="screenStats" class="hidden">
-  <header class="sub-header">
-    <span class="back" id="backToMainFromStats">←</span>
-    <h1>지출 통계분석</h1>
-  </header>
-
-  <div class="wrap">
-
-    <section class="card">
-      <div class="stats-range-row">
-        <span id="statsRangeLabel">-</span>
-        <select id="statsRangePreset" class="stats-select">
-          <option value="thisMonth" selected>이번 달</option>
-          <option value="lastMonth">지난 달</option>
-          <option value="custom">기간 직접 선택</option>
-        </select>
-      </div>
-      <div id="statsCustomRangeWrap" class="stats-custom-range hidden">
-        <input type="date" id="statsCustomStart">
-        <span>~</span>
-        <input type="date" id="statsCustomEnd">
-        <button id="statsCustomApply" type="button">적용</button>
-      </div>
-
-      <div class="stats-total-label">선택 기간 총 지출</div>
-      <div class="stats-total-amount" id="statsTotalAmount">0원</div>
-      <div class="stats-compare" id="statsCompare">직전 같은 기간 대비 -</div>
-    </section>
-
-    <section class="card">
-      <h2>월평균 (완료된 달 기준)</h2>
-      <div class="stats-avg" id="statsAvgAmount">데이터가 더 쌓이면 계산돼요</div>
-    </section>
-
-    <section class="card">
-      <h2>카테고리별 지출</h2>
-      <div id="categoryBreakdownList"></div>
-    </section>
-
-    <section class="card">
-      <h2>작성자별 지출</h2>
-      <div id="writerBreakdownList"></div>
-    </section>
-
-  </div>
-</div><!-- /#screenStats -->
+</div>
 
 <div id="toast"></div>
 
