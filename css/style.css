@@ -249,51 +249,60 @@ input[type=number]{ -moz-appearance:textfield; }
   .act-btn{ height:34px; padding:0 12px; font-size:13px; }
 }
 
-/* ---------- 고정비 화면 ---------- */
+/* ---------- 고정비 화면 (한 줄 한 항목, 한 화면에 들어오게 촘촘하게) ---------- */
 .sub-header{
-  display:flex; align-items:center; gap:4px; padding:12px 12px 4px; max-width:760px; margin:0 auto;
+  display:flex; align-items:center; gap:2px; padding:8px 8px 0; max-width:760px; margin:0 auto;
 }
 .sub-header .back{
   width:44px; height:44px; border:none; background:transparent; font-size:28px; line-height:1; border-radius:12px;
 }
 .sub-header h1{ font-size:17px; font-weight:600; }
-.wrap{ max-width:760px; margin:0 auto; padding:8px 20px 48px; display:flex; flex-direction:column; gap:16px; }
-section.card{ border:1px solid var(--line); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:12px; }
+.wrap{ max-width:760px; margin:0 auto; padding:4px 16px 32px; display:flex; flex-direction:column; gap:12px; }
+section.card{ border:1px solid var(--line); border-radius:18px; padding:14px 14px 16px; display:flex; flex-direction:column; gap:8px; }
 .card h2{ font-size:15px; font-weight:600; }
-.month-hint{ font-size:13px; color:var(--ink-soft); line-height:1.5; }
-.empty-hint{ font-size:14px; color:var(--ink-faint); padding:8px 0; }
+.month-hint{ font-size:12px; color:var(--ink-faint); line-height:1.4; }
+.empty-hint{ font-size:14px; color:var(--ink-faint); padding:6px 0; }
 
+/* 체크 | 이름 | 날짜 | 금액 → 한 줄 */
 .check-row{
-  display:grid; grid-template-columns:24px minmax(0,1fr) auto; gap:8px 12px; align-items:center;
-  padding:12px 0; border-bottom:1px solid var(--line);
+  display:grid; grid-template-columns:22px minmax(0,1fr) 98px 82px; gap:6px; align-items:center;
+  min-height:48px; padding:4px 0; border-bottom:1px solid var(--line);
 }
-.check-row:last-child{ border-bottom:none; }
-.check-row input[type=checkbox]{ width:22px; height:22px; accent-color:var(--accent); }
-.check-row .name{ font-size:15px; font-weight:500; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.check-row:last-of-type{ border-bottom:none; }
+.check-row input[type=checkbox]{ width:20px; height:20px; margin:0; accent-color:var(--accent); }
+.check-row .name{ font-size:14px; font-weight:500; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .check-row input[type=date],
 .check-row input[type=number]{
-  height:40px; padding:0 10px; border:1px solid var(--line-strong); border-radius:10px; background:#fff; font-size:14px;
+  width:100%; min-width:0; height:36px; padding:0 6px; border:1px solid var(--line-strong); border-radius:9px; background:#fff; font-size:12.5px;
 }
-.check-row input[type=date]{ grid-column:2; width:100%; }
-.check-row input[type=number]{ grid-column:3; grid-row:2; width:120px; text-align:right; font-weight:600; }
+.check-row input[type=date]::-webkit-calendar-picker-indicator{ display:none; }
+.check-row input[type=number]{ text-align:right; font-weight:600; font-size:13.5px; }
+.card .submit-btn{ height:48px; font-size:15px; margin-top:4px; }
 
-.tpl-row{ display:flex; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid var(--line); }
-.tpl-row:last-child{ border-bottom:none; }
+.tpl-row{ display:flex; align-items:center; gap:6px; min-height:52px; padding:4px 0; border-bottom:1px solid var(--line); }
+.tpl-row:last-of-type{ border-bottom:none; }
 .tpl-row .tag{ display:none; }
 .tpl-row .meta{ flex:1; min-width:0; }
-.tpl-row .name{ font-size:15px; font-weight:500; }
-.tpl-row .sub{ font-size:13px; color:var(--ink-soft); margin-top:2px; }
-.tpl-row .amt{ font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
-.tpl-row .icon-btn{ width:36px; height:36px; border:none; background:transparent; border-radius:10px; font-size:15px; }
+.tpl-row .name, .tpl-row .sub{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tpl-row .name{ font-size:14px; font-weight:500; }
+.tpl-row .sub{ font-size:12px; color:var(--ink-soft); margin-top:1px; }
+.tpl-row .amt{ font-size:14px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.tpl-row .icon-btn{ width:34px; height:34px; border:none; background:transparent; border-radius:9px; font-size:14px; }
 .tpl-row .icon-btn:active{ background:var(--surface); }
 
 .add-btn{
-  height:48px; border:1px dashed #C9CDD2; background:#fff; border-radius:12px; font-size:14px; font-weight:500; color:var(--ink-soft);
+  height:44px; border:1px dashed #C9CDD2; background:#fff; border-radius:12px; font-size:14px; font-weight:500; color:var(--ink-soft);
 }
-.template-form{ display:flex; flex-direction:column; gap:14px; padding:16px; background:#FAFAFB; border-radius:16px; }
+.template-form{ display:flex; flex-direction:column; gap:12px; padding:14px; background:#FAFAFB; border-radius:14px; }
 .form-actions{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
-.form-actions .submit-btn{ height:48px; font-size:15px; }
+.form-actions .submit-btn{ height:46px; font-size:15px; margin-top:0; }
 .ghost-btn{ background:#fff !important; color:var(--ink) !important; border:1px solid var(--line-strong) !important; }
+
+/* 화면이 넉넉하면(폴드·데스크탑) 날짜·금액 칸을 조금 넓게 */
+@media (min-width:640px){
+  .check-row{ grid-template-columns:22px minmax(0,1fr) 140px 120px; gap:10px; }
+  .check-row input[type=date]::-webkit-calendar-picker-indicator{ display:block; }
+}
 
 /* ---------- 토스트 ---------- */
 #toast{
