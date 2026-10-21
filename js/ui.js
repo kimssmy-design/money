@@ -43,19 +43,33 @@ export function showToast(message) {
 
 /* ---------------- 기간 요약 렌더링 ---------------- */
 
+function formatRangeDate(dateStr, withYear) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return withYear ? `${y}년 ${m}월 ${d}일` : `${m}월 ${d}일`;
+}
+
 export function renderSummary(totals, range) {
+  const crossYear = range.start.slice(0, 4) !== range.end.slice(0, 4);
   document.getElementById("rangeLabel").textContent =
-    `${range.start.replaceAll("-", ".")} – ${range.end.replaceAll("-", ".")}`;
+    `${formatRangeDate(range.start, crossYear)} – ${formatRangeDate(range.end, crossYear)} 지출`;
 
   document.getElementById("totalAmount").textContent = formatWon(totals.total);
   document.getElementById("cashAmount").textContent = formatWon(totals.cash);
   document.getElementById("cardAmount").textContent = formatWon(totals.card);
 
-  document.getElementById("writerTotal-seonyeong").textContent = formatWon(totals.byWriter.seonyeong);
-  document.getElementById("writerTotal-hyunwoo").textContent = formatWon(totals.byWriter.hyunwoo);
-  document.getElementById("writerTotal-gongyong").textContent = formatWon(totals.byWriter.gongyong);
+  // 누가 썼나: 금액 + 비율 막대
+  const writerSum = totals.byWriter.seonyeong + totals.byWriter.hyunwoo + totals.byWriter.gongyong;
+  ["seonyeong", "hyunwoo", "gongyong"].forEach((w) => {
+    const amt = totals.byWriter[w];
+    const pct = writerSum > 0 ? Math.round((amt / writerSum) * 100) : 0;
+    document.getElementById(`writerTotal-${w}`).textContent = formatWon(amt);
+    document.getElementById(`writerPct-${w}`).textContent = `${pct}%`;
+    const bar = document.getElementById(`shareBar-${w}`);
+    bar.style.flexGrow = writerSum > 0 ? amt : 0;
+    bar.style.display = amt > 0 ? "block" : "none";
+  });
 
-  // 외식·간식 예산 막대
+  // 외식·간식 한도 타일
   const dining = totals.dining.amount;
   const over = dining > DINING_WARNING_THRESHOLD;
   const pct = Math.min(100, Math.round((dining / DINING_WARNING_THRESHOLD) * 100));
@@ -64,8 +78,8 @@ export function renderSummary(totals, range) {
   document.getElementById("diningCount").textContent = `${totals.dining.count}건`;
   document.getElementById("diningBar").style.width = `${pct}%`;
   document.getElementById("diningMsg").textContent = over
-    ? `${formatWon(dining - DINING_WARNING_THRESHOLD)} 초과했어요`
-    : `${formatWon(DINING_WARNING_THRESHOLD - dining)} 남았어요`;
+    ? `${formatWon(dining - DINING_WARNING_THRESHOLD)} 초과`
+    : `${formatWon(DINING_WARNING_THRESHOLD - dining)} 남음`;
 
   document.getElementById("groceryAmount").textContent = formatWon(totals.grocery.amount);
   document.getElementById("groceryCount").textContent = `${totals.grocery.count}건`;
