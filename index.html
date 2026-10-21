@@ -43,47 +43,56 @@
     <!-- 왼쪽(폰에서는 전체): 요약 + 내역 -->
     <main class="main-col">
 
-      <section class="summary">
-        <div class="range-label" id="rangeLabel">-</div>
-        <div class="total-label">선택 기간 지출</div>
-        <div class="total-amount" id="totalAmount">0원</div>
-
-        <div class="stat-grid three">
-          <div class="stat"><div class="k">선영</div><div class="v" id="writerTotal-seonyeong">0원</div></div>
-          <div class="stat"><div class="k">현우</div><div class="v" id="writerTotal-hyunwoo">0원</div></div>
-          <div class="stat"><div class="k">공용</div><div class="v" id="writerTotal-gongyong">0원</div></div>
-        </div>
-
-        <div class="stat-grid two">
-          <div class="stat"><div class="k">현금·체크카드</div><div class="v" id="cashAmount">0원</div></div>
-          <div class="stat"><div class="k">신용카드</div><div class="v" id="cardAmount">0원</div></div>
-        </div>
-
-        <!-- 외식·간식 예산 막대 (20만원 초과 시 .over) -->
-        <div class="budget" id="diningAlert">
-          <div class="budget-head">
-            <span class="label">🍽️외식·간식</span>
-            <span class="amt"><b id="diningAmount">0원</b> / 200,000원</span>
-          </div>
-          <div class="bar"><div class="bar-fill" id="diningBar"></div></div>
-          <div class="budget-foot">
-            <span id="diningMsg"></span>
-            <span id="diningCount">0건</span>
-          </div>
-        </div>
-
-        <div class="sub-stat" id="groceryAlert">
-          <span class="label">🛒생활</span>
-          <span><b id="groceryAmount">0원</b> · <span id="groceryCount">0건</span></span>
-        </div>
-
-        <div class="streak-row">
-          <div class="streak-chip">🔥 선영 <b id="streakSeonyeong">0</b>일 <span id="badgeSeonyeong"></span></div>
-          <div class="streak-chip">🔥 현우 <b id="streakHyunwoo">0</b>일 <span id="badgeHyunwoo"></span></div>
+      <!-- 1. 총액 (검정 카드) -->
+      <section class="hero">
+        <div class="hero-range" id="rangeLabel">-</div>
+        <div class="hero-total" id="totalAmount">0원</div>
+        <div class="hero-streak">
+          <span>🔥 선영 <b id="streakSeonyeong">0</b>일 연속 <span id="badgeSeonyeong"></span></span>
+          <span>🔥 현우 <b id="streakHyunwoo">0</b>일 연속 <span id="badgeHyunwoo"></span></span>
         </div>
       </section>
 
-      <section class="list-section">
+      <!-- 2. 누가 썼나 / 어떻게 냈나 -->
+      <section class="card">
+        <h3 class="card-title">누가 썼나</h3>
+        <div class="share-bar">
+          <div class="share s1" id="shareBar-seonyeong"></div>
+          <div class="share s2" id="shareBar-hyunwoo"></div>
+          <div class="share s3" id="shareBar-gongyong"></div>
+        </div>
+        <div class="share-rows">
+          <div class="share-row"><span class="dot s1"></span><span class="name">선영</span><span class="pct" id="writerPct-seonyeong">0%</span><span class="amt" id="writerTotal-seonyeong">0원</span></div>
+          <div class="share-row"><span class="dot s2"></span><span class="name">현우</span><span class="pct" id="writerPct-hyunwoo">0%</span><span class="amt" id="writerTotal-hyunwoo">0원</span></div>
+          <div class="share-row"><span class="dot s3"></span><span class="name">공용</span><span class="pct" id="writerPct-gongyong">0%</span><span class="amt" id="writerTotal-gongyong">0원</span></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3 class="card-title">어떻게 냈나</h3>
+        <div class="pay-grid">
+          <div class="pay-box"><div class="k">현금·체크카드</div><div class="v" id="cashAmount">0원</div></div>
+          <div class="pay-box"><div class="k">신용카드</div><div class="v" id="cardAmount">0원</div></div>
+        </div>
+      </section>
+
+      <!-- 3. 외식·간식 / 생활 -->
+      <div class="tile-grid">
+        <section class="tile budget" id="diningAlert">
+          <div class="tile-label">🍽️ 외식·간식</div>
+          <div class="tile-amt" id="diningAmount">0원</div>
+          <div class="bar"><div class="bar-fill" id="diningBar"></div></div>
+          <div class="tile-foot"><span id="diningMsg"></span> · <span id="diningCount">0건</span></div>
+        </section>
+        <section class="tile" id="groceryAlert">
+          <div class="tile-label">🛒 생활</div>
+          <div class="tile-amt" id="groceryAmount">0원</div>
+          <div class="bar-space"></div>
+          <div class="tile-foot">이번 기간 <span id="groceryCount">0건</span></div>
+        </section>
+      </div>
+
+      <section class="card list-section">
         <div class="list-head">
           <h2>기록 <span class="count" id="entryCount">0건</span></h2>
           <button class="text-btn" id="copyEntriesBtn" type="button">📋 복사</button>
@@ -104,17 +113,19 @@
         <button class="close-btn" id="closePanelBtn" type="button" aria-label="닫기">✕</button>
       </div>
 
+      <div class="field-row">
       <div class="field">
         <label for="entryDate">날짜</label>
         <input type="date" id="entryDate">
       </div>
 
-      <div class="field">
+      <div class="field field-amount">
         <label for="entryAmount">금액</label>
         <div class="amount-wrap">
           <input type="number" id="entryAmount" placeholder="0" inputmode="numeric" min="0" onwheel="this.blur()">
           <span class="won">원</span>
         </div>
+      </div>
       </div>
 
       <div class="field">
